@@ -1,0 +1,20 @@
+
+# Compiled Prgs
+*.fxp
+
+
+# Libraries
+*.vc*
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.fll
+
+
+# Executables
+*.exe
+*.app
+
+#Backup files
+*.??k
+
