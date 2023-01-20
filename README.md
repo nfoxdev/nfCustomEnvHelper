@@ -4,10 +4,10 @@ A helper procedure to create custom vfp startup \
 environments with ease on any selected folder.
 
 Just run and select one of your project folders;\
-nfCustEnvHelper will ask if you want to clone your actual environment or \
-create fresh versions for a new environment.
+nfCustEnvHelper will ask if you want to clone your actual\
+environment or create fresh resource/config versions.
 
-Youll find the following files under the folder "_customenv": 
+You'll find the following files under the folder "_customenv": 
 
 - config.fwp ( option clone in use / make new )
 - resource.dbf ( option clone in use / make new )
@@ -16,11 +16,8 @@ Youll find the following files under the folder "_customenv":
 - desktop shortcut ( created at desktop and _customenv folder )
 
  During the clone / create process you'll be asked for a custom icon\
- to be used for the windows shortcut; selecting none / escape defaults\
- to vfp icon.
- 
- You'll be asked for to pick a color for your new _screen.backcolor.
-
+ to be used for the windows shortcut -selecting none / escape defaults\
+ to vfp icon.- and pick a color for your new _screen.backcolor.
 
  *nfCustEnvHelper creates a startup.prg with some basic helpers\
  (  useful function keys you'll see listed at startup and a custom \
@@ -33,10 +30,8 @@ nfCustEnvHelper does not change your actual vfp config; it's safe to delete\
 _customenv folder and desktop shortcut, just remember that\
 .\\_customenv\\_command.prg holds the command history for that environment.
 
+*------------------------------------------------------------------------------*
 
-
-
- 
  
   
    
