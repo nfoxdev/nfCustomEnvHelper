@@ -1,34 +1,23 @@
 # nfCustomEnvHelper
 
-A helper procedure to create custom vfp startup \
-environments with ease on any selected folder.
+Having a custom config.fpw and resource files for each project\
+is a great convenience to separate  command history, \
+startup environment and debug sessions. It also helps to identify\
+each open project with their own icon in the taskbar.
 
-Just run and select one of your project folders;\
-nfCustEnvHelper will ask if you want to clone your actual\
-environment or create fresh resource/config versions.
+nfCustomEnvHelper simply clones your current environment \
+( or make fresh ones ) on any folder you choose and \
+creates the shortcut on your desktop.
 
-You'll find the following files under the folder "_customenv": 
+Config.fpw and resource.dbf are saved in &projectfolder\\_customenv\\ ,\
+along with startup.prg*, favicon.ico and a copy of the desktop shortcut.\
 
-- config.fwp ( option clone in use / make new )
-- resource.dbf ( option clone in use / make new )
-- startup.prg *
-- favicon.ico ( select at runtime )
-- desktop shortcut ( created at desktop and _customenv folder )
-
- During the clone / create process you'll be asked for a custom icon\
- to be used for the windows shortcut -selecting none / escape defaults\
- to vfp icon.- and pick a color for your new _screen.backcolor.
-
- *nfCustEnvHelper creates a startup.prg with some basic helpers\
- (  useful function keys you'll see listed at startup and a custom \
-menu to easily edit your config and startup routine )\
-If your actual config.fp calls a program using "command = " it will\
-be automatically called from startup.prg to keep it running before the\
-custom startup with a special flag to identify it as a common startup.
-  
-nfCustEnvHelper does not change your actual vfp config; it's safe to delete\
-_customenv folder and desktop shortcut, just remember that\
-.\\_customenv\\_command.prg holds the command history for that environment.
+*startup.prg:
+- defines a menu with options to edit config.fpw and startup.prg,\
+- sets 2 function keys you might find useful just as a sample:\
+ F11 to clear screen/list your current folder\
+ F12 to hide all windows and activate screen / go back to previous window when done. \
+   
 
 *------------------------------------------------------------------------------*
 
