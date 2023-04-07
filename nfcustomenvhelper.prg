@@ -1,10 +1,10 @@
 *----------------------------------------------------------------------------
 * Marco Plaza  @nFoxdev 2023
 * Create a custom startup environment for desired project folder
-* v 1.0.1
+* v 1.0.2
 *-----------------------------------------------------------------------------
 Local err
-Local workDir
+Local workdir
 Local custfilesdir
 Local curresource
 Local custresource
@@ -23,6 +23,7 @@ Local oshell
 Local shname
 
 #Define envfolder '_customEnv'
+#Define wcap 'nfCustomEnvHelper'
 #Define crlf Chr(13)+Chr(10)
 
 Set Safety Off
@@ -31,17 +32,15 @@ Set Notify Off
 
 Try
 
-	workDir = Getdir('','Create custom config & resource files for VFP project folder','Folder')
+	workdir = Getdir('','Create custom config & resource files for VFP project folder','Folder')
 
-	If !Directory(m.workDir) Or Lastkey() = 27
-		Exit
+	If !Directory(m.workdir) Or Lastkey() = 27
+		ERROR 'No directory selected!'
 	Endif
-
-
 
 *-- check & create vfpenv folder in destfolder
 
-	custfilesdir = m.workDir + envfolder
+	custfilesdir = m.workdir + envfolder
 
 	If !Directory(m.custfilesdir)
 		Mkdir (m.custfilesdir)
@@ -56,24 +55,20 @@ Try
 
 *-- SELECT CLONE / NEW ENV:
 
-
-	lcreate		= !File(m.custresource)
 	lsame		= Atc(m.curresource,m.custresource) > 0
-	lreset 		= m.lsame And Messagebox('Clear your current custom resource? No=leave as is',4,'nfCustomEnvHelper') = 6
-	Clone 		= !m.lsame And File(m.curresource) And Messagebox('Clone current resource? select No to create an empty one',4,'nfCustomEnvHelper') = 6
-	loverwrite	= !m.lsame And !m.lcreate And  File(m.custresource) And Messagebox('Destination already has a resource file! '+crlf+' overwrite?',4,'nfCustomEnvHelper') = 6
+	lreset 		= m.lsame And qu('Clear current custom resource?')
+	Clone 		= !m.lsame And File(m.curresource)  And qu('Clone current resource? No = create a new one')
+	loverwrite	= !m.lsame And File(m.custresource) And qu('Destination already has a resource file! '+crlf+' overwrite?')
 
 	Do Case
-	Case !m.lcreate And !m.loverwrite And !m.lreset
-* nada
-	Case m.clone And ( m.lcreate Or m.loverwrite )
+	Case m.clone
 		Select * From (m.curresource) Into Table (m.custresource)
-		Messagebox('Resource cloned',0)
-	Case !m.clone Or m.lreset
+		Messagebox('Resource cloned',0,wcap)
+	Case m.lreset Or m.loverwrite
 		Set Resource Off
 		Create Table (m.custresource) ( Type c(12),Id c(12),Name m(4),ReadOnly l(1),ckval N(6,0),Data m(4),Updated d(8))
 		Set Resource On
-		Messagebox('New Resource created',0)
+		Messagebox('New Resource created',0,wcap)
 	Endcase
 
 	Use
@@ -104,7 +99,7 @@ Try
 
 *-- set resource in _config.fpw
 	writekey(m.custconfig,'resource',m.custresource)
-	writekey(m.custconfig,'default',m.workDir)
+	writekey(m.custconfig,'default',m.workdir)
 	writekey(m.custconfig,'command',Textmerge('do "<<m.custStartup>>"'))
 
 
@@ -112,14 +107,14 @@ Try
 
 	custicon = Forcepath('favicon.ico',m.custfilesdir)
 
-	If  !File(m.custicon) Or Messagebox('Use '+m.custicon+'?',4,'nfCustomEnvHelper') # 6
+	If  !File(m.custicon) Or Messagebox('Use '+m.custicon+'?',4,wcap) # 6
 
 		Try
 			selicon = Getfile('ico','Icon.:','Select',0,'Select a custom icon for this shortcut')
 			Copy File (m.selicon) To (m.custicon)
 		Catch
 			custicon = _vfp.ServerName
-			Messagebox('No icon selected',0,'nfCustomEnvHelper')
+			Messagebox('No icon selected',0,wcap)
 		Endtry
 
 	Endif
@@ -131,7 +126,7 @@ Try
 
 	shname = Forcepath(;
 		'VFP9 @ ';
-		+Proper(Chrtran(m.workDir,'\:',' '));
+		+Proper(Chrtran(m.workdir,'\:',' '));
 		+'.lnk',;
 		oshell.specialfolders.Item('desktop') ;
 		)
@@ -140,8 +135,8 @@ Try
 
 		.targetpath			= '"'+_vfp.ServerName+'"'
 		.workingdirectory	= m.custfilesdir
-		.arguments			= [-c]+m.custconfig
-		.Description		= 'Environment using _resource.dbf + _config.fpw'
+		.arguments			= [-c"]+m.custconfig+["]
+		.Description		= 'created using nfCustomenvHelper'
 		.windowstyle		= 1
 
 		If File(m.custicon)
@@ -158,7 +153,7 @@ Try
 
 *-- open shortcut:
 
-	Messagebox('Shortcut saved as '+m.shname+' ok to open ',0,'nfCustomEnvHelper')
+	Messagebox('Shortcut saved as '+m.shname+' ok to open ',0,wcap)
 
 	Strtofile('start "" "'+m.shname+'"','runhelper.bat')
 
@@ -167,12 +162,24 @@ Try
 	Erase runhelper.bat
 
 
+Catch To err When err.ErrorNo = 1098
+	Messagebox(err.Message,0,wcap)
+
 Catch To err
-
-	Messagebox('OOps!'+Chr(13)+Textmerge('<<err.message>>  at <<err.lineno>>'),48,'nfCustomEnvHelper')
-
+	Messagebox(Textmerge('Oops.. <<CHR(13)>>error number:<<err.errorno>>  at:<<err.lineno>> <<CHR(13)>> <<err.message>>'),48,wcap)
 
 Endtry
+
+*--------------------------------------------------------------
+Function qu(cm)
+*--------------------------------------------
+Local ures
+ures = Messagebox(m.cm,3,wcap)
+If m.ures = 2
+	Error 'Assistant canceled'
+Else
+	Return ures = 6
+Endif
 
 *---------------------------------
 Function GetKey(m.csrc,Key)
@@ -233,23 +240,23 @@ Endif
 
 
 *------------------------------------------------------------------------
-Procedure createstartup(workDir,custstartup,custconfig,custbackcolor)
+Procedure createstartup(workdir,custstartup,custconfig,custbackcolor)
 *------------------------------------------------------------------------
 Local curcommand
-Local curPrgCall
-Local commonStartup
+Local curprgcall
+Local commonstartup
 Local DoCmd
 
 *-- check current config.sys command:
 #Define cflag ' '+Replicate('&',2) + '#COMMONSTARTUPFLAG'
 
 curcommand = GetKey(Sys(2019),'command')
-curPrgCall = Alltrim(Strextr(m.curcommand,'do ','with',1,1+2),1,'"',' ')
+curprgcall = Alltrim(Strextr(m.curcommand,'do ','with',1,1+2),1,'"',' ')
 
-If File(m.curPrgCall)
+If File(m.curprgcall)
 
-	commonStartup = Strextract(Filetostr(m.curPrgCall),'DO ',cflag,1,1+4)
-	DoCmd = Evl(m.commonStartup,m.curcommand)
+	commonstartup = Strextract(Filetostr(m.curprgcall),'DO ',cflag,1,1+4)
+	DoCmd = Evl(m.commonstartup,m.curcommand)
 
 Else
 
@@ -272,10 +279,10 @@ TEXT TO temp TEXTMERGE noshow
 Define Pad _devpad Of _Msysmenu Prompt 'Custom Env.'
 
 Define Popup _devpop
-Define Bar 1 Of _devpop Prompt "edit <<JUSTFNAME(m.custStartup)>>"
-Define Bar 2 Of _devpop Prompt "edit <<JUSTFNAME(m.custConfig)>>"
-Define Bar 3 Of _devpop Prompt "do <<JUSTFNAME(m.custStartup)>>"
-Define Bar 4 Of _devpop Prompt "explore workdir"
+Define Bar 1 Of _devpop Prompt 'edit "<<JUSTFNAME(m.custStartup)>>"'
+Define Bar 2 Of _devpop Prompt 'edit "<<JUSTFNAME(m.custConfig)>>"'
+Define Bar 3 Of _devpop Prompt 'do "<<JUSTFNAME(m.custStartup)>>"'
+Define Bar 4 Of _devpop Prompt 'explore workdir'
 
 On Pad _devpad Of _Msysmenu Activate Popup _devpop
 On Selection Bar 1 Of _devpop Editsource("<<m.custStartup>>")
@@ -321,8 +328,8 @@ Endwith
 
 
 ON KEY LABEL F10 set path to (GETDIR('','CurrentPath: '+SET('path'),'Add Path',1+2+8+64)) additive
-ON KEY LABEL f11 do showdir in <<m.custStartup>>
-ON KEY LABEL F12 do activatescreen in <<m.custStartup>>
+ON KEY LABEL f11 do showdir in "<<m.custStartup>>"
+ON KEY LABEL F12 do activatescreen in "<<m.custStartup>>"
 
 *-------------------------
 PROCEDURE explorewd
@@ -367,4 +374,3 @@ ENDTEXT
 *-- save custom startup.prg:
 Strtofile(m.temp,m.custstartup)
 
-*--------------------------------------------------------------
