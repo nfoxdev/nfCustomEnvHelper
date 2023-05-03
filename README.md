@@ -13,7 +13,11 @@ Config.fpw and resource.dbf are saved in &projectfolder\\_customenv\\ ,\
 along with startup.prg*, favicon.ico and a copy of the desktop shortcut.
 
 *startup.prg:
-- defines a menu with options to edit config.fpw and startup.prg,
+- defines a menu with options to:
+  - edit config.fpw / startup.prg / afterStartup.prg
+  - run startup.prg / afterStartup.prg
+  - run this utility
+
 - sets 2 function keys you might find useful:
   - F11: clear screen/list your current folder
   - F12: hide/unhide windows and activate command window
@@ -37,7 +41,11 @@ junto con startup.prg*, favicon.ico y una copia del acceso directo del escritori
 
 *startup.prg:
 
-- define un menú con opciones para editar config.fpw y startup.prg,
+- define un menú con opciones para:
+  - editar config.fpw / startup.prg / afterStartup.prg
+  - ejecutar startup.prg / afterStartup.prg
+  - ejecutar esta utilidad
+  
 - establece 2 teclas de función que puede encontrar útiles como muestra:
   - F11: borrar la pantalla/listar su carpeta actual
   - F12: ocultar/des-ocultar todas las ventanas y activar ventana de comandos
