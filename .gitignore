@@ -18,3 +18,7 @@
 #Backup files
 *.??k
 
+_customEnv
+
+
+

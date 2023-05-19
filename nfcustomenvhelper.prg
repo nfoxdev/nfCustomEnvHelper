@@ -1,9 +1,9 @@
 *----------------------------------------------------------------------------
 * Create a custom startup environment for desired project folder
-* v 1.1.0
+* v 1.2.0
 * Marco Plaza  @nFoxdev 2023
 *-----------------------------------------------------------------------------
-Private all 
+Private All
 
 #Define envfolder '_customEnv'
 #Define wcap 'nfCustomEnvHelper'
@@ -15,7 +15,7 @@ Set Notify Off
 
 Try
 
-	workdir = Getdir('','Create custom config & resource files for VFP project folder','Folder')
+	workdir = Getdir('','Select or create a new folder:','nfCustomEnvHelper',16+32+64)
 
 	If !Directory(m.workdir)
 		Error 'No directory selected!'
@@ -29,22 +29,21 @@ Try
 		Mkdir (m.custfilesdir)
 	Endif
 
-
 *-- check for _resource.dbf in dest folder:
 
-	curresource = Sys(2005)
-	custresource = Forcepath('resource.dbf',m.custfilesdir)
+	curresource		= Sys(2005)
+	custresource	= Forcepath('resource.dbf',m.custfilesdir)
 
 
 *-- SELECT CLONE / NEW ENV:
 
 	If Atc(m.curresource,m.custresource) > 0
-		lreset 	= qu('Reset current custom resource?',.t.)
-		lproceed = m.lreset
-		lclone = .f.
+		lreset		= qu('Reset current custom resource?',.T.)
+		lproceed 	= m.lreset
+		lclone 		= .F.
 	Else
-		lclone 	  = File(m.curresource)  And qu('Clone current resource? No = creates a new one')
-		lproceed  = !File(m.custresource) Or qu('Destination already has a resource file! '+crlf+' overwrite?')
+		lproceed  	= !File(m.custresource) Or qu('Destination already has a resource file! '+crlf+' overwrite?')
+		lclone 	  	= File(m.curresource)  And m.lproceed And qu('Clone current resource? No = creates a new one')
 	Endif
 
 
@@ -72,6 +71,7 @@ Try
 
 	custconfig= Forcepath('config.fpw',m.custfilesdir)
 	curconfig = Sys(2019)
+
 	If Atc(m.custconfig,m.curconfig) = 0
 		If File(m.curconfig)
 			Copy File (m.curconfig) To (m.custconfig)
@@ -81,12 +81,19 @@ Try
 	Endif
 
 *-- pick a custom backcolor:
-	custbackcolor = Getcolor(_Screen.BackColor)
+
+	custbackcolor = 0
+
+	If qu('Pick a Custom Screeen BackColor?')
+		custbackcolor = Getcolor(_Screen.BackColor)
+	Endif
+
+	custbackcolor = Iif(m.custbackcolor>0,m.custbackcolor,Rgb(255,255,255))
+
 
 *-- create startup.prg in customconfig folder
-
-	custstartup = Forcepath('startup.prg',m.custfilesdir)
-	custafterstartup = Forcepath('afterStartup.prg',m.custfilesdir)
+	custstartup 		= Forcepath('startup.prg',m.custfilesdir)
+	custafterstartup 	= Forcepath('afterStartup.prg',m.custfilesdir)
 	createstartup(m.workdir,m.custstartup,m.custconfig,m.custbackcolor,custafterstartup)
 
 *-- set resource in _config.fpw
@@ -96,33 +103,43 @@ Try
 
 
 *-- select icon
+	Try
+* is there a folder custom icon?
+		custicon = Strextract(Filetostr(Forcepath('desktop.ini',m.workdir)),'IconResource=',',')
+		If !File(m.custicon)
+			Error 'file not found'
+		Endif
+	Catch
+		custicon = Forcepath('favicon.ico',m.custfilesdir)
+	Endtry
 
-	custicon = Forcepath('favicon.ico',m.custfilesdir)
 
-	If  !File(m.custicon) Or !qu('Use '+m.custicon+'?')
+	If  !File(m.custicon) Or !qu('Use Icon '+m.custicon+'?')
 
 		selicon = Getfile('ico','Icon.:','Select',0,'Select a custom icon for this shortcut')
 
 		If File(m.selicon)
 			Copy File (m.selicon) To (m.custicon)
 		Else
-			custicon = _vfp.ServerName
 			qu('No icon selected - continue?')
+			custicon = _vfp.ServerName
 		Endif
 
 	Endif
 
 
-*-- create shortcut in desktop
+*-- create shortcut
 
 	oshell = Createobject('wscript.shell')
 
-	shname = Forcepath(;
-		'VFP9 @ ';
-		+Proper(Chrtran(m.workdir,'\:',' '));
-		+'.lnk',;
-		oshell.specialfolders.Item('desktop') ;
+	defaultshortcut = Forcepath(;
+		'VFP9 @ '+Proper(Chrtran(m.workdir,'\:',' ')),;
+		oshell.specialfolders.Item('desktop');
 		)
+
+	shname = Putfile('Save shortcut as: ',m.defaultshortcut,'lnk')
+	shname = Forceext(rtrim(Evl(m.shname,m.defaultshortcut)),'lnk')
+
 
 	With m.oshell.createshortcut( m.shname )
 
@@ -148,11 +165,8 @@ Try
 
 	If Messagebox('Shortcut saved as '+m.shname+' open? ',4,wcap) = 6
 
-		Strtofile('start "" "'+m.shname+'"','runhelper.bat')
-
-		Run runhelper.bat /N
-
-		Erase runhelper.bat
+		ir = textmerge([run start "" "<<m.shname>>"])
+		&ir
 
 	Endif
 
@@ -164,13 +178,13 @@ Catch To err
 
 Endtry
 
-*--------------------------------------------------------------
+*--------------------------------------------
 Function qu(cm,defno)
 *--------------------------------------------
 Local ures
-ures = Messagebox(m.cm,3+iif(m.defno,256,0),wcap)
+ures = Messagebox(m.cm,3+Iif(m.defno,256,0),wcap)
 If m.ures = 2
-	Error 'Assistant canceled'
+	Error 'Helper canceled'
 Else
 	Return ures = 6
 Endif
@@ -254,23 +268,28 @@ Define Popup _devpop
 Define Bar 1 Of _devpop Prompt 'edit "<<JUSTFNAME(m.custConfig)>>"'
 Define Bar 2 Of _devpop Prompt 'edit "<<JUSTFNAME(m.custStartup)>>"'
 Define Bar 3 Of _devpop Prompt 'edit "<<JUSTFNAME(m.custAfterStartup)>>"'
-Define Bar 4 Of _devpop Prompt 'do "<<JUSTFNAME(m.custStartup)>>"'
-Define Bar 5 Of _devpop Prompt 'Open file explorer'
-Define Bar 6 Of _devpop Prompt 'create a custom Startup'
+Define Bar 4 Of _devpop Prompt 'F5 do "<<JUSTFNAME(m.custStartup)>>"'
+Define Bar 5 Of _devpop Prompt 'F9  Modify project'
+Define Bar 6 Of _devpop Prompt 'F10 Open <<m.workdir>> in file explorer'
+Define Bar 7 Of _devpop Prompt 'Create a custom Startup'
 
 On Pad _devpad Of _Msysmenu Activate Popup _devpop
 On Selection Bar 1 Of _devpop Editsource("<<m.custConfig>>")
 On Selection Bar 2 Of _devpop Editsource("<<m.custStartup>>")
 On Selection Bar 3 Of _devpop Editsource("<<m.custAfterStartup>>")
 On Selection Bar 4 Of _devpop Do "<<m.custStartup>>"
-On Selection Bar 5 Of _devpop Do explorewd In "<<m.custStartup>>"
-On Selection Bar 6 Of _devpop Do "<<forceext(getwordnum(sys(16),3),'prg')>>"
+On Selection Bar 5 Of _devpop keyboard "{F9}" clear
+On Selection Bar 6 Of _devpop keyboard "{F10}" clear
+On Selection Bar 7 Of _devpop Do "<<forceext(getwordnum(sys(16),3),'prg')>>"
 
 Set Status Bar On
 Set Memowidth To 100
 
-On Key Label f11 Do showdir In "<<m.custStartup>>"
-On Key Label f12 Do activatescreen In "<<m.custStartup>>"
+on key label F5  do "<<m.custStartup>>"
+on key label F9  modify project (sys(2000,'*.pjx')) nowait
+on key label F10 do explorewd 		In "<<m.custStartup>>"
+On Key Label F11 Do showdir 		In "<<m.custStartup>>"
+On Key Label F12 Do activatescreen 	In "<<m.custStartup>>"
 
 With _Screen
 
@@ -279,37 +298,37 @@ With _Screen
 	addproperty(.oCustenv,'toggle',.T.)
 	addproperty(.oCustEnv,'lastWontop','')
 
+	clear
 
-	Clear
-
-	.Caption 	= 'VFP9: @' + Fullpath('')
-	.ForeColor	= Rgb(255,255,255)
+	.Visible	= .T.
+	.Caption 	= Fullpath('')
+	.ForeColor	= <<getforecolor(m.custBackColor)>>
 	.BackColor 	= <<m.custbackcolor>>
 
+	.FontName	= 'FoxFont'
+	.FontSize	= 14
+
+	? fullpath('')
+	? ''
+
 	.FontName	= 'Consolas'
-	.FontSize	= 16
-	.Visible	= .T.
+	.FontSize	= 14
 	.FontBold	=.F.
 
-	? '.',_Screen.Caption
-	? '.',Datetime()
-	? '. F11: show prgs in current directory'
-	? '. F12: Toggle Show desktop + command window '
-	? ''
-	? ''
+	showdir(.t.)
 
-	.FontSize = 12
+	projFile = sys(2000,'*.pjx')
 
-	? 'Path:',Set("path")
+	if !empty(m.projFile)
+		modify project (m.projFile) nowait
+	endif
 
-	Dir *.prg
 
 Endwith
 
 If File("<<m.custAfterStartup>>")
 	Do "<<m.custAfterStartup>>"
 Endif
-
 
 
 *-------------------------
@@ -321,12 +340,24 @@ Endwith
 
 
 *----------------------------
-Procedure showdir
+Procedure showdir(noclear)
 *----------------------------
+
 activatescreen(.T.)
-Clear
-Dir *.prg
-? 'Path:' +Set('path')
+
+if !m.noclear
+	clear
+endif
+
+_screen.FontSize = 16
+? 'current dir: ',fullpath('')
+_screen.FontSize = 14
+? ''
+? 'search path: '
+? Set('path')
+? ''
+? 'dir *.*:'
+Dir *.*
 
 *------------------------------
 Function activatescreen(ShowD)
@@ -358,7 +389,7 @@ ENDTEXT
 
 *-- save custom startup.prg:
 Strtofile(m.temp,m.custstartup)
-
+compile (m.custstartup)
 
 *-- create afterStartup.prg if not present:
 
@@ -378,3 +409,21 @@ If !File(m.custafterstartup)
 	Strtofile(m.temp,m.custafterstartup)
 
 Endif
+
+
+*---------------------------------
+Function getforecolor(tncolor)
+*---------------------------------
+
+Local r,g,b,luma
+r = Bitand(m.tncolor, 0xff)
+g = Bitand(Bitrshift(m.tncolor, 8), 0xff)
+b = Bitand(Bitrshift(m.tncolor, 16), 0xff)
+
+
+luma = ((0.299 * m.r) + (0.587 * m.g) + (0.114 * m.b)) / 255
+
+Return Iif(m.luma > 0.7, Rgb(0,0,0), Rgb(255,255,255))
+
+
+
