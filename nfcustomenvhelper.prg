@@ -1,6 +1,6 @@
 *----------------------------------------------------------------------------
 * Create a custom startup environment for desired project folder
-* v 1.2.0
+* v 1.2.01
 * Marco Plaza  @nFoxdev 2023
 *-----------------------------------------------------------------------------
 Private All
@@ -305,11 +305,16 @@ With _Screen
 	.ForeColor	= <<getforecolor(m.custBackColor)>>
 	.BackColor 	= <<m.custbackcolor>>
 
-	.FontName	= 'FoxFont'
-	.FontSize	= 14
+	.FontName	= 'Consolas'
+	.FontSize	= 16
 
-	? fullpath('')
-	? ''
+	? 'Hotkeys:'
+	? '  F5: run startup.prg '
+	? '  F9: modify project '
+	? ' F10: explore <<m.workdir>>'
+	? ' F11: show files in current directory'
+	? ' F12: Toggle Show desktop + command window '
+	? '*'
 
 	.FontName	= 'Consolas'
 	.FontSize	= 14
@@ -350,10 +355,10 @@ if !m.noclear
 endif
 
 _screen.FontSize = 16
-? 'current dir: ',fullpath('')
+? 'Current Directory: ',fullpath('')
 _screen.FontSize = 14
 ? ''
-? 'search path: '
+? 'Search Path: '
 ? Set('path')
 ? ''
 ? 'dir *.*:'
