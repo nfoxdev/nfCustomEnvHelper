@@ -1,6 +1,6 @@
 *----------------------------------------------------------------------------
 * Create a custom startup environment for desired project folder
-* v 1.2.1
+* v 1.2.2
 * Marco Plaza  @nFoxdev 2023
 * just a utility script..  ! 
 *-----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ Try
 	With m.oshell.createshortcut( m.shname )
 
 		.targetpath			= '"'+_vfp.ServerName+'"'
-		.workingdirectory	= m.custfilesdir
+		.workingdirectory	= m.workdir
 		.arguments			= [-c"]+m.custconfig+["]
 		.Description		= 'created using nfCustomenvHelper'
 		.windowstyle		= 1
