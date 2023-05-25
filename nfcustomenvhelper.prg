@@ -1,7 +1,8 @@
 *----------------------------------------------------------------------------
 * Create a custom startup environment for desired project folder
-* v 1.2.01
+* v 1.2.1
 * Marco Plaza  @nFoxdev 2023
+* just a utility script..  ! 
 *-----------------------------------------------------------------------------
 Private All
 
@@ -38,7 +39,7 @@ Try
 *-- SELECT CLONE / NEW ENV:
 
 	If Atc(m.curresource,m.custresource) > 0
-		lreset		= qu('Reset current custom resource?',.T.)
+		lreset		= qu('Reset current custom resource?')
 		lproceed 	= m.lreset
 		lclone 		= .F.
 	Else
@@ -67,7 +68,7 @@ Try
 	Set Resource On
 
 
-*-- _config.fpw in dest folder:
+*-- config.fpw in dest folder:
 
 	custconfig= Forcepath('config.fpw',m.custfilesdir)
 	curconfig = Sys(2019)
@@ -80,55 +81,53 @@ Try
 		Endif
 	Endif
 
+
 *-- pick a custom backcolor:
 
 	custbackcolor = 0
 
-	If qu('Pick a Custom Screeen BackColor?')
-		custbackcolor = Getcolor(_Screen.BackColor)
-	Endif
+	Messagebox('Pick a Custom Screeen BackColor...',0,wcap)
 
+	custbackcolor = Getcolor(_Screen.BackColor)
 	custbackcolor = Iif(m.custbackcolor>0,m.custbackcolor,Rgb(255,255,255))
 
 
-*-- create startup.prg in customconfig folder
-	custstartup 		= Forcepath('startup.prg',m.custfilesdir)
-	custafterstartup 	= Forcepath('afterStartup.prg',m.custfilesdir)
-	createstartup(m.workdir,m.custstartup,m.custconfig,m.custbackcolor,custafterstartup)
-
-*-- set resource in _config.fpw
-	writekey(m.custconfig,'resource',m.custresource)
-	writekey(m.custconfig,'default',m.workdir)
-	writekey(m.custconfig,'command',Textmerge('do "<<m.custStartup>>"'))
-
-
 *-- select icon
+
+	iconcopy	= Forcepath('favicon'+Sys(2015)+'.ico',m.custfilesdir)
+	custIcon 	= ''
+
 	Try
-* is there a folder custom icon?
+
+* check for folder custom icon
+
 		custicon = Strextract(Filetostr(Forcepath('desktop.ini',m.workdir)),'IconResource=',',')
+
 		If !File(m.custicon)
-			Error 'file not found'
+			error 'no icon'
 		Endif
+
 	Catch
-		custicon = Forcepath('favicon.ico',m.custfilesdir)
+		qu('Folder has no custom icon.. Select one for this shortcut',0)
+
 	Endtry
 
 
 	If  !File(m.custicon) Or !qu('Use Icon '+m.custicon+'?')
 
-		selicon = Getfile('ico','Icon.:','Select',0,'Select a custom icon for this shortcut')
+		custicon = Getfile('Select an ico, exe or dll file to set icon for this shortcut:ico,exe,dll','Icon.:','Select',0,'Select a custom icon for this shortcut')
 
-		If File(m.selicon)
-			Copy File (m.selicon) To (m.custicon)
-		Else
-			qu('No icon selected - continue?')
+		If !File(m.custicon)
+
+			qu('No icon selected.. using vfp icon',0)
 			custicon = _vfp.ServerName
+
 		Endif
 
 	Endif
 
 
-*-- create shortcut
+*-- create shortcut?
 
 	oshell = Createobject('wscript.shell')
 
@@ -138,8 +137,25 @@ Try
 		)
 
 	shname = Putfile('Save shortcut as: ',m.defaultshortcut,'lnk')
-	shname = Forceext(rtrim(Evl(m.shname,m.defaultshortcut)),'lnk')
 
+	If Empty(m.shname) And qu('Cancel?',4)
+		Error 'Cancelled'
+	Endif
+
+
+	shname = Forceext(Rtrim(Evl(m.shname,m.defaultshortcut)),'lnk')
+
+
+*-- use a icon copy when icon file selected:
+
+	If m.custicon # m.iconcopy And Lower(Justext(m.custicon)) == 'ico'
+		Erase (Addbs(m.custfilesdir)+'favicon*.ico')
+		Copy File (m.custicon) To (m.iconcopy)
+		custicon = m.iconcopy
+	Endif
+
+
+*-- ...create shortcut
 
 	With m.oshell.createshortcut( m.shname )
 
@@ -149,9 +165,7 @@ Try
 		.Description		= 'created using nfCustomenvHelper'
 		.windowstyle		= 1
 
-		If File(m.custicon)
-			.iconlocation = m.custicon
-		Endif
+		.iconlocation = m.custicon
 
 		.Save()
 
@@ -161,11 +175,23 @@ Try
 	Copy File (m.shname) To (Forcepath(m.shname,m.custfilesdir))
 
 
-*-- open shortcut?:
+*-- create startup.prg in customconfig folder
+	custstartup 		= Forcepath('startup.prg',m.custfilesdir)
+	custafterstartup 	= Forcepath('afterStartup.prg',m.custfilesdir)
+	createstartup(m.workdir,m.custstartup,m.custconfig,m.custbackcolor,custafterstartup)
 
-	If Messagebox('Shortcut saved as '+m.shname+' open? ',4,wcap) = 6
+*-- set resource and call startup.prg in config.fpw
+	writekey(m.custconfig,'resource',m.custresource)
+	writekey(m.custconfig,'default',m.workdir)
+	writekey(m.custconfig,'command',Textmerge('do "<<m.custStartup>>"'))
 
-		ir = textmerge([run start "" "<<m.shname>>"])
+
+
+*-- open?:
+
+	If qu('Shortcut saved as '+m.shname+'! open? ',4)
+
+		ir = Textmerge([run start "" "<<m.shname>>"])
 		&ir
 
 	Endif
@@ -179,11 +205,14 @@ Catch To err
 Endtry
 
 *--------------------------------------------
-Function qu(cm,defno)
+Function qu(cm,diagtype)
 *--------------------------------------------
+
 Local ures
-ures = Messagebox(m.cm,3+Iif(m.defno,256,0),wcap)
-If m.ures = 2
+diagtype = Iif(Pcount()=2,m.diagtype,3)
+ures = Messagebox(m.cm,m.diagtype+Iif(m.diagtype=4,0,256),wcap)
+
+If m.ures = 2 
 	Error 'Helper canceled'
 Else
 	Return ures = 6
@@ -394,7 +423,7 @@ ENDTEXT
 
 *-- save custom startup.prg:
 Strtofile(m.temp,m.custstartup)
-compile (m.custstartup)
+Compile (m.custstartup)
 
 *-- create afterStartup.prg if not present:
 
