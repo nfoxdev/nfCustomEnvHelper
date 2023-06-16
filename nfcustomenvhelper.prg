@@ -1,6 +1,6 @@
 *----------------------------------------------------------------------------
 * Create a custom startup environment for desired project folder
-* v 1.2.2
+* v 1.2.3
 * Marco Plaza  @nFoxdev 2023
 * just a utility script..  ! 
 *-----------------------------------------------------------------------------
@@ -315,8 +315,8 @@ Set Status Bar On
 Set Memowidth To 100
 
 on key label F5  do "<<m.custStartup>>"
+on key label F8  do explorewd 		In "<<m.custStartup>>"
 on key label F9  modify project (sys(2000,'*.pjx')) nowait
-on key label F10 do explorewd 		In "<<m.custStartup>>"
 On Key Label F11 Do showdir 		In "<<m.custStartup>>"
 On Key Label F12 Do activatescreen 	In "<<m.custStartup>>"
 
@@ -339,8 +339,8 @@ With _Screen
 
 	? 'Hotkeys:'
 	? '  F5: run startup.prg '
+	? '  F8: explore <<m.workdir>>'
 	? '  F9: modify project '
-	? ' F10: explore <<m.workdir>>'
 	? ' F11: show files in current directory'
 	? ' F12: Toggle Show desktop + command window '
 	? '*'
@@ -359,6 +359,8 @@ With _Screen
 
 
 Endwith
+
+SET SYSMENU SAVE
 
 If File("<<m.custAfterStartup>>")
 	Do "<<m.custAfterStartup>>"
