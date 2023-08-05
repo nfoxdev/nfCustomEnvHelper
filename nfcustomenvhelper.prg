@@ -300,7 +300,9 @@ Define Bar 3 Of _devpop Prompt 'edit "<<JUSTFNAME(m.custAfterStartup)>>"'
 Define Bar 4 Of _devpop Prompt 'F5 do "<<JUSTFNAME(m.custStartup)>>"'
 Define Bar 5 Of _devpop Prompt 'F9  Modify project'
 Define Bar 6 Of _devpop Prompt 'F10 Open <<m.workdir>> in file explorer'
-Define Bar 7 Of _devpop Prompt 'Create a custom Startup'
+Define Bar 7 Of _devpop Prompt 'F11 Show files'
+Define Bar 8 Of _devpop Prompt 'F12 Show desktop'
+Define Bar 9 Of _devpop Prompt 'Create a custom Startup'
 
 On Pad _devpad Of _Msysmenu Activate Popup _devpop
 On Selection Bar 1 Of _devpop Editsource("<<m.custConfig>>")
@@ -309,14 +311,16 @@ On Selection Bar 3 Of _devpop Editsource("<<m.custAfterStartup>>")
 On Selection Bar 4 Of _devpop Do "<<m.custStartup>>"
 On Selection Bar 5 Of _devpop keyboard "{F9}" clear
 On Selection Bar 6 Of _devpop keyboard "{F10}" clear
-On Selection Bar 7 Of _devpop Do "<<forceext(getwordnum(sys(16),3),'prg')>>"
+On Selection Bar 7 Of _devpop keyboard "{F11}" clear
+On Selection Bar 8 Of _devpop keyboard "{F12}" clear
+On Selection Bar 9 Of _devpop Do "<<forceext(getwordnum(sys(16),3),'prg')>>"
 
 Set Status Bar On
 Set Memowidth To 100
 
 on key label F5  do "<<m.custStartup>>"
-on key label F8  do explorewd 		In "<<m.custStartup>>"
 on key label F9  modify project (sys(2000,'*.pjx')) nowait
+on key label F10 do explorewd 		In "<<m.custStartup>>"
 On Key Label F11 Do showdir 		In "<<m.custStartup>>"
 On Key Label F12 Do activatescreen 	In "<<m.custStartup>>"
 
