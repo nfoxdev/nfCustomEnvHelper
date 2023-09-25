@@ -1,8 +1,8 @@
 *----------------------------------------------------------------------------
-* Create a custom startup environment for desired project folder
-* v 1.2.3
-* Marco Plaza  @nFoxdev 2023
-* just a utility script..  ! 
+* Creates a custom startup environment for desired project folder
+* a shortcut in selected folder.
+* Marco Plaza, 2023
+* v.1.2.31  https://github.com/nfoxdev/nfCustomEnvHelper
 *-----------------------------------------------------------------------------
 Private All
 
@@ -56,7 +56,7 @@ Try
 		If m.lclone
 			Select * From (m.curresource) Into Table (m.custresource)
 			Use
-			Use In (Select('resource'))
+			Use In (Select(Juststem(m.curresource)))
 			Messagebox('Current Resource cloned',0,wcap)
 		Else
 			Create Table (m.custresource) ( Type c(12),Id c(12),Name m(4),ReadOnly l(1),ckval N(6,0),Data m(4),Updated d(8))
@@ -95,7 +95,7 @@ Try
 *-- select icon
 
 	iconcopy	= Forcepath('favicon'+Sys(2015)+'.ico',m.custfilesdir)
-	custIcon 	= ''
+	custicon 	= ''
 
 	Try
 
@@ -104,7 +104,7 @@ Try
 		custicon = Strextract(Filetostr(Forcepath('desktop.ini',m.workdir)),'IconResource=',',')
 
 		If !File(m.custicon)
-			error 'no icon'
+			Error 'no icon'
 		Endif
 
 	Catch
@@ -212,7 +212,7 @@ Local ures
 diagtype = Iif(Pcount()=2,m.diagtype,3)
 ures = Messagebox(m.cm,m.diagtype+Iif(m.diagtype=4,0,256),wcap)
 
-If m.ures = 2 
+If m.ures = 2
 	Error 'Helper canceled'
 Else
 	Return ures = 6
