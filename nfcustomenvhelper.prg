@@ -2,8 +2,9 @@
 * Creates a custom startup environment for desired project folder
 * a shortcut in selected folder.
 * Marco Plaza, 2023
-* v.1.2.4  https://github.com/nfoxdev/nfCustomEnvHelper
+* v.1.2.6  https://github.com/nfoxdev/nfCustomEnvHelper
 *-----------------------------------------------------------------------------
+
 private all
 
 #define envfolder '_customEnv'
@@ -83,90 +84,11 @@ try
 
 
 *-- pick a custom backcolor:
-
 	custbackcolor = 0
 	messagebox('Pick a Custom Screeen BackColor...',0,wcap)
 	custbackcolor = getcolor(_screen.backcolor)
 	custbackcolor = iif(m.custbackcolor>0,m.custbackcolor,rgb(255,255,255))
 
-
-*-- select icon
-
-	iconcopy	= forcepath('favicon'+sys(2015)+'.ico',m.custfilesdir)
-	custicon 	= ''
-
-	try
-
-* check for folder custom icon
-
-		custicon = strextract(filetostr(forcepath('desktop.ini',m.workdir)),'IconResource=',',')
-
-		if !file(m.custicon)
-			error 'no icon'
-		endif
-
-	catch
-		qu('Folder has no custom icon.. Select one for this shortcut',0)
-
-	endtry
-
-
-	if  !file(m.custicon) or !qu('Use Icon '+m.custicon+'?')
-
-		custicon = getfile('Select an ico, exe or dll file to set icon for this shortcut:ico,exe,dll','Icon.:','Select',0,'Select a custom icon for this shortcut')
-
-		if !file(m.custicon)
-
-			qu('No icon selected.. using vfp icon',0)
-			custicon = _vfp.servername
-
-		endif
-
-	endif
-
-
-*-- create shortcut?
-
-	oshell = createobject('wscript.shell')
-
-	defaultshortcut = forcepath(;
-		'VFP9 @ '+proper(chrtran(m.workdir,'\:',' ')),;
-		oshell.specialfolders.item('desktop');
-		)
-
-	shname = putfile('Save shortcut as: ',m.defaultshortcut,'lnk')
-
-	if empty(m.shname) and qu('Cancel?',4)
-		error 'Cancelled'
-	endif
-
-
-	shname = forceext(rtrim(evl(m.shname,m.defaultshortcut)),'lnk')
-
-
-*-- use a icon copy when icon file selected:
-
-	if m.custicon # m.iconcopy and lower(justext(m.custicon)) == 'ico'
-		copy file (m.custicon) to (m.iconcopy)
-		custicon = m.iconcopy
-		erase (addbs(m.custfilesdir)+'favicon*.ico')
-	endif
-
-
-*-- ...create shortcut
-
-	with m.oshell.createshortcut( m.shname )
-		.targetpath			= '"'+_vfp.servername+'"'
-		.workingdirectory	= m.workdir
-		.arguments			= [-c"]+m.custconfig+["]
-		.description		= 'created using nfCustomenvHelper'
-		.windowstyle		= 1
-		.iconlocation 		= m.custicon
-		.save()
-	endwith
-
-*-- save also in custom config folder:
-	copy file (m.shname) to (forcepath(m.shname,m.custfilesdir))
 
 *-- create afterstartup.prg in customconfig folder as sample
 	custstartup 		= forcepath('startup.prg',m.custfilesdir)
@@ -178,6 +100,81 @@ try
 	writekey(m.custconfig,'default',m.workdir)
 	writekey(m.custconfig,'command',textmerge('do "<<m.custStartup>>"'))
 
+
+*-- select icon
+
+	selectedicon 	= ''
+
+* try use folder custom icon:
+
+	try
+		selectedicon = strextract(filetostr(forcepath('desktop.ini',m.workdir)),'IconResource=',',')
+
+		if !file(m.selectedicon)
+			error 'no icon'
+		endif
+
+	catch
+		qu('Folder has no custom icon.. Select one for this shortcut',0)
+	endtry
+
+
+	if  !file(m.selectedicon) or !qu('Use Icon '+m.selectedicon+'?',4)
+
+		selectedicon = getfile('Select an ico, exe or dll file to set icon for this shortcut:ico,exe,dll','Icon.:','Select',0,'Select a custom icon for this shortcut')
+
+		if !file(m.selectedicon)
+			qu('No icon selected.. using vfp icon',0)
+			selectedicon = _vfp.servername
+		endif
+
+	endif
+
+
+*-- when icon file selected is an ico ,  force windows to upate miniatures using a copy:
+
+	if lower(justext(m.selectedicon)) == 'ico'
+		iconcopy	= forcepath('favicon'+sys(2015)+'.ico',m.custfilesdir)
+		copy file (m.selectedicon) to (m.iconcopy)
+		selectedicon = m.iconcopy
+	endif
+
+
+*-- select shortcut folder/name:
+
+	oshell = createobject('wscript.shell')
+
+	defaultshortcut = forcepath(;
+		'VFP9 @ '+proper(chrtran(m.workdir,'\:',' ')),;
+		oshell.specialfolders.item('desktop');
+		)
+
+	do while .t.
+		shname = putfile('Save shortcut as: ',m.defaultshortcut,'lnk')
+		do case
+		case !empty(m.shname)
+			exit
+		case qu(' No valid shortcut selected - Cancel procedure?',4)
+			error 'No shortcut file name selected!'
+		endcase
+	enddo
+
+	shname = forceext(rtrim(evl(m.shname,m.defaultshortcut)),'lnk')
+
+*-- ...create shortcut
+
+	with m.oshell.createshortcut( m.shname )
+		.targetpath			= '"'+_vfp.servername+'"'
+		.workingdirectory	= m.workdir
+		.arguments			= [-c"]+m.custconfig+["]
+		.description		= 'created using nfCustomenvHelper'
+		.windowstyle		= 1
+		.iconlocation 		= m.selectedIcon
+		.save()
+	endwith
+
+*-- save also in custom config folder:
+	copy file (m.shname) to (forcepath(m.shname,m.custfilesdir))
 
 *-- open?:
 
@@ -199,7 +196,7 @@ function qu(cm,diagtype)
 *--------------------------------------------
 
 local ures
-diagtype = iif(pcount()=2,m.diagtype,3)
+diagtype = evl(m.diagtype,3)
 ures = messagebox(m.cm,m.diagtype+iif(m.diagtype=4,0,256),wcap)
 
 if m.ures = 2
@@ -282,8 +279,11 @@ endif
 procedure createstartup(workdir,custstartup,custconfig,custbackcolor,afterstartup)
 *---------------------------------------------------------------------------------------
 
+local projfile,thisprg,temp
+
 *-- create startup.prg
-local temp
+
+thisprg = forceext(getwordnum(sys(16),3),'prg')
 
 text to temp noshow textmerge
 *-------------------------------------------------------
@@ -292,62 +292,57 @@ text to temp noshow textmerge
 *-------------------------------------------------------
 
 define pad _devpad of _msysmenu prompt 'Custom Env.'
-define popup _devpop
-define bar 1 of _devpop prompt 'edit "<<JUSTFNAME(m.custConfig)>>"'
-define bar 2 of _devpop prompt 'edit "<<JUSTFNAME(m.custStartup)>>"'
-define bar 3 of _devpop prompt 'edit "<<JUSTFNAME(m.custAfterStartup)>>"'
-define bar 4 of _devpop prompt 'F5 do "<<JUSTFNAME(m.custStartup)>>"'
-define bar 5 of _devpop prompt 'Create a custom Startup'
+define popup _devpop 
+define bar 1 of _devpop prompt ' Create a Custom Startup'
+define bar 2 of _devpop prompt ' do "<<JUSTFNAME(m.custStartup)>>"' key F5,'F5'
+define bar 3 of _devpop prompt '\-'
+define bar 4 of _devpop prompt ' edit "<<JUSTFNAME(m.custConfig)>>"'
+define bar 5 of _devpop prompt ' edit "<<JUSTFNAME(m.custStartup)>>"'
+define bar 6 of _devpop prompt ' edit "<<JUSTFNAME(m.custAfterStartup)>>"'
 
 on pad _devpad of _msysmenu activate popup _devpop
-on selection bar 1 of _devpop editsource("<<m.custConfig>>")
-on selection bar 2 of _devpop editsource("<<m.custStartup>>")
-on selection bar 3 of _devpop editsource("<<m.custAfterStartup>>")
-on selection bar 4 of _devpop do "<<m.custStartup>>"
-on selection bar 5 of _devpop do "<<forceext(getwordnum(sys(16),3),'prg')>>"
+on selection bar 1 of _devpop do "<<m.thisprg>>"
+on selection bar 2 of _devpop do "<<m.custStartup>>"
+on selection bar 4 of _devpop editsource("<<m.custConfig>>")
+on selection bar 5 of _devpop editsource("<<m.custStartup>>")
+on selection bar 6 of _devpop editsource("<<m.custAfterStartup>>")
 
 set status bar on
 set memowidth to 100
 
-on key label f5  do "<<m.custStartup>>"
+cd "<<m.workdir>>"
 
 with _screen
-
 
   .visible  	= .t.
   .caption   	= fullpath('')
   .forecolor  	= <<getforecolor(m.custbackcolor)>>
   .backcolor   	= <<m.custbackcolor>>
 
-  .fontname  = 'Consolas'
-  .fontsize  = 14
+  .fontname  = 'Ebrima'
+  .fontsize  = 12
 
   clear
   @ 2,5 say fullpath('') font 'foxfont',26
   ? ' '
-  dir *.prg
-
-  projfile = sys(2000,'*.pjx')
-
-  if !empty(m.projfile)
-    modify project (m.projfile) nowait
-  endif
-
+  ? 'Search Path: '
+  ? '-'+strtran(set('path'),';','   -')
+  ? 'dir *.*:'
+  dir *.*
 
 endwith
-
-set sysmenu save
 
 if file("<<m.afterStartup>>")
   do "<<m.afterStartup>>"
 endif
+
+set sysmenu save
 
 ENDTEXT
 
 *-- save startup.prg:
 
 strtofile(m.temp,m.custstartup)
-
 
 
 *-- create afterStartup.prg if not present:
@@ -360,10 +355,10 @@ if !file(m.afterstartup)
 * https://github.com/nfoxdev/customEnvHelper
 *-------------------------------------------------------
 * place here code to run after startup for this project
-* ie: "do myCommonInitProcedure"
 *
-
-	endtext
+*
+do <<forcepath("nfcustomenvhelperutils.prg",justpath(m.thisprg))>>
+	ENDTEXT
 
 	strtofile(m.temp,m.afterstartup)
 
