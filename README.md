@@ -10,7 +10,7 @@ nfCustomEnvHelper simply clones your current environment \
 creates the shortcut on your desktop.
 
 Config.fpw and resource.dbf are saved in &projectfolder\\_customenv\\ ,\
-along with startup.prg*, favicon.ico and a copy of the desktop shortcut.
+along with startup.prg*, favicon.ico and a copy of the shortcut.
 
 *startup.prg:
 - defines a menu with options to:
@@ -18,9 +18,8 @@ along with startup.prg*, favicon.ico and a copy of the desktop shortcut.
   - run startup.prg / afterStartup.prg
   - run this utility
 
-- sets 2 function keys you might find useful:
-  - F11: clear screen/list your current folder
-  - F12: hide/unhide windows and activate command window
+- sets 1 function key:
+  - F5: runs startup.prg 
    
 
 *------------------------------------------------------------------------------*
@@ -37,7 +36,7 @@ nfCustomEnvHelper simplemente clona su entorno actual\
 crea el acceso directo en su escritorio.
 
 Config.fpw y resource.dbf se guardan en &projectfolder\_customenv,\
-junto con startup.prg*, favicon.ico y una copia del acceso directo del escritorio.
+junto con startup.prg*, favicon.ico y una copia del acceso directo.
 
 *startup.prg:
 
@@ -46,9 +45,9 @@ junto con startup.prg*, favicon.ico y una copia del acceso directo del escritori
   - ejecutar startup.prg / afterStartup.prg
   - ejecutar esta utilidad
   
-- establece 2 teclas de función que puede encontrar útiles como muestra:
-  - F11: borrar la pantalla/listar su carpeta actual
-  - F12: ocultar/des-ocultar todas las ventanas y activar ventana de comandos
+- establece 1 tecla de función:
+  - F5: ejecutar startup.prg
+
   
 -------------------------------------------------- ----------------------------
 
