@@ -9,14 +9,14 @@ thisprg = sys(16)
 thisfolder = fullpath('')
 
 define bar  7 of _devpop prompt '\-'
-define bar  8 of _devpop prompt 'Open File Explorer '           key f8, 'F8'
-define bar  9 of _devpop prompt 'Open CMD in current folder'    key ctrl+f8, 'ctrl+F8'
-define bar 10 of _devpop prompt 'Modify project'                key f9,'F9'
-define bar 11 of _devpop prompt 'Show files'                    key f11,'F11'
-define bar 12 of _devpop prompt 'Toggle desktop/active window'  key f12,'F12'
+define bar  8 of _devpop prompt ' Open File Explorer '           key f8, 'F8'
+define bar  9 of _devpop prompt ' Open CMD in current folder'    key ctrl+f8, 'ctrl+F8'
+define bar 10 of _devpop prompt ' Modify project'                key f9,'F9'
+define bar 11 of _devpop prompt ' Show files'                    key f11,'F11'
+define bar 12 of _devpop prompt ' Toggle desktop/active window'  key f12,'F12'
 
 on selection bar  8 of _devpop do explorewd  in "&thisprg"
-on selection bar  9 of _devpop run cmd
+on selection bar  9 of _devpop do runcmd in "&thisprg"
 on selection bar 10 of _devpop do openproject in "&thisprg"
 on selection bar 11 of _devpop do showdir in "&thisprg"
 on selection bar 12 of _devpop do activatescreen   in "&thisprg"
@@ -26,6 +26,14 @@ on selection bar 12 of _devpop do activatescreen   in "&thisprg"
 _screen.addproperty('oCustEnv',createobject('empty'))
 addproperty(_screen.ocustenv,'toggle',.t.)
 addproperty(_screen.ocustenv,'lastWontop','')
+
+*----------------------------
+procedure runcmd
+*----------------------------
+local oexp
+oexp = createobject('shell.application')
+oexp.ShellExecute('cmd')
+
 
 
 *----------------------------
@@ -66,8 +74,11 @@ endif
 ? 'Search Path: '
 ? '-'+strtran(set('path'),';','   -')
 ? ''
-? 'dir *.*:'
-dir *.*
+? 'dir *.pjx:'
+dir *.pjx
+
+? 'dir *.prg:'
+dir *.prg
 
 *------------------------------
 function activatescreen(showd)
