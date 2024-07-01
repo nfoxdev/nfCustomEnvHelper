@@ -26,7 +26,7 @@ along with startup.prg*, favicon.ico and a copy of the shortcut.
   - F5: runs startup.prg 
 
 If you have a common config routine you want to run on all your projects,
-just include it editing afterstartup.
+just include it in "afterstartup".
 
 
 *------------------------------------------------------------------------------*
@@ -60,7 +60,7 @@ junto con startup.prg*, favicon.ico y una copia del acceso directo.
 - F5: ejecuta startup.prg
 
 Si tiene una rutina de configuración común que desea ejecutar en todos sus proyectos,
-simplemente inclúyalo editando después del inicio.
+simplemente inclúyalo en "afterStartup".
 
 
 -------------------------------------------------- ----------------------------
