@@ -3,9 +3,12 @@
 
 Start vfp directly on your project folder from a  a shortcut. 
 You'll get a separate command history, startup environment, debug sessions \
-and a custom icon in the taskbar.
- 
-Just save this utility on a definitive location, and run it to start the helper.
+and a custom icon in the taskbar; if you pin the shortcut, youll see a separate \
+recent files history for each project too.
+
+ Instructions:
+ save this utility on a definitive location, and run it to start the helper:
+
 
 nfCustomenvHelper clones the current environment files or make new ones in any folder \
 you choose and creates a shortcut on your desktop, adding a menu pad with options to \
@@ -21,13 +24,12 @@ along with startup.prg*, favicon.ico and a copy of the shortcut.
   - edit startup.prg
   - edit afterStartup.prg
   - run startup.prg
-  - run afterStartup.prg
 
 - sets 1 function key:
   - F5: runs startup.prg 
 
 If you have a common config routine you want to run on all your projects,
-just include it in "afterstartup".
+just run it from  "afterstartup".
 
 
 *------------------------------------------------------------------------------*
@@ -55,13 +57,12 @@ junto con startup.prg*, favicon.ico y una copia del acceso directo.
 - editar inicio.prg
 - editar después de Startup.prg
 - ejecutar startup.prg
-- ejecutar afterStartup.prg
 
 - establece 1 tecla de función:
 - F5: ejecuta startup.prg
 
 Si tiene una rutina de configuración común que desea ejecutar en todos sus proyectos,
-simplemente inclúyalo en "afterStartup".
+simplemente ejecútela desde  "afterStartup".
 
 
 -------------------------------------------------- ----------------------------
