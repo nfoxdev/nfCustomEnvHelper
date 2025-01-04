@@ -1,8 +1,9 @@
 # nfCustomEnvHelper 
 [español](#esp)
 
-Start vfp directly on your project folder from a  a shortcut with separate command \
-history, startup environment, debug sessions their own icon in the taskbar. 
+Start vfp directly on your project folder from a  a shortcut. 
+You'll get a separate command history, startup environment, debug sessions \
+and a custom icon in the taskbar.
  
 Just save this utility on a definitive location, and run it to start the helper.
 
