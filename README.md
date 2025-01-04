@@ -1,21 +1,20 @@
 # nfCustomEnvHelper 
 [español](#esp)
 
-Start vfp directly on your project folder from a  a shortcut. 
-You'll get a separate command history, startup environment, debug sessions \
-and a custom icon in the taskbar; if you pin the shortcut, youll see a separate \
-recent files history for each project too.
+Start vfp directly on your project folder from a shortcut. 
+You'll get a separate command history, recent files history, 
+startup environment ( config.fpw and resource ), debug sessions 
+and a custom icon in the taskbar. 
 
  Instructions:
  save this utility on a definitive location, and run it to start the helper:
 
 
-nfCustomenvHelper clones the current environment files or make new ones in any folder \
-you choose and creates a shortcut on your desktop, adding a menu pad with options to \
-easily edit your config.fp and project startup routine.
+nfCustomenvHelper clones the current environment files or make new ones in any 
+folder you choose and creates a shortcut on your desktop, adding a menu pad with
+options to easily edit your config.fp and project startup routine.
 
-Config.fpw and resource.dbf are saved in {{projectfolder}}\\_customenv\\, \
-along with startup.prg*, favicon.ico and a copy of the shortcut.
+Config.fpw and resource.dbf are saved in {{projectfolder}}\\_customenv\\, along with startup.prg*, favicon.ico and a copy of the shortcut.
 
 *startup.prg:
 - defines a menu with options to:
@@ -35,12 +34,13 @@ just run it from  "afterstartup".
 *------------------------------------------------------------------------------*
 
 # nfCustomEnvHelper {#esp}
-Inicie vfp directamente en la carpeta de su proyecto desde un acceso directo con \
-Historial de comandos separado, entorno de inicio, sesiones de depuración \
-y su propio icono en la barra de tareas.
+Inicie vfp directamente en la carpeta de su proyecto desde un acceso directo.
+Obtendrá un historial de comandos separado, un historial de archivos recientes,
+entorno de inicio (config.fpw y recurso), sesiones de depuración
+y un icono personalizado en la barra de tareas.
 
-Simplemente guarde esta utilidad en una ubicación definitiva y ejecútela \
-para iniciar el asistente.
+Instrucciones:
+guarde esta utilidad en una ubicación definitiva y ejecútela para iniciar el asistente.
 
 nfCustomenvHelper clona los archivos del entorno actual o crea nuevos en \
 cualquier carpeta que elijas y crea un acceso directo en su escritorio,\
