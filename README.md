@@ -19,6 +19,9 @@ Copies of Config.fpw and resource.dbf are saved in {{projectfolder}}\\_customenv
   - List Files ( F11 )
   - Toggle desktop/active window ( F12 )
 
+note:
+ Run this utility as many times as you need for a given folder to recreate/fix the shortcut or update to a newer version
+
 
 If you have a common config routine you want to run on all your projects,
 just include it in "afterstartup".
@@ -46,6 +49,9 @@ Las copias de Config.fpw y resource.dbf se guardan en {{projectfolder}}\\_custom
 - Alternar entre escritorio y ventana activa (F12)
 
 Si tiene una rutina de configuración común que desea ejecutar en todos sus proyectos, simplemente inclúyala en "afterstartup".
+
+nota:
+ Ejecute esta utilidad tantas veces como necesite para una carpeta para recrear/reparar el acceso directo o actualizar a una nueva versión
 
 -------------------------------------------------- ----------------------------
 
