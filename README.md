@@ -9,10 +9,13 @@ nfCustomenvHelper does not affect your VFP installation; it clones the current e
 
 Copies of Config.fpw and resource.dbf are saved in {{projectfolder}}\\_customenv\\,  with startup.prg*, favicon.ico.
 
-*The shortcut runs vfp and calls startup.prg, wich defines a menu with options to:
-  - edit afterStartup.prg ( add here any code you want to run )
+The shortcut runs vfp and calls startup.prg, wich defines a menu with options to:
+
+  - edit config.fpw ( edits project config.fpw )
+  - edit common startup ( code that runs for all projects )
+  - edit project startup ( code that runs for this project )
+  - view/edit command history
   - run startup.prg ( F5 ) ( restarts environment )
-  - edit config.fpw
   - open File Explorer ( F8 )
   - open Command Prompt ( Ctrl+F8 )
   - Modify Project ( F9 )
@@ -20,12 +23,7 @@ Copies of Config.fpw and resource.dbf are saved in {{projectfolder}}\\_customenv
   - Toggle desktop/active window ( F12 )
 
 note:
- Run this utility as many times as you need for a given folder to recreate/fix the shortcut or update to a newer version
-
-
-If you have a common config routine you want to run on all your projects,
-just include it in "afterstartup".
-
+ Run this utility as many times as you need to recreate/fix a shortcut or update to a newer version
 
 *------------------------------------------------------------------------------*
 
@@ -38,20 +36,21 @@ nfCustomenvHelper no afecta a su instalación de VFP; clona los archivos de ento
 
 Las copias de Config.fpw y resource.dbf se guardan en {{projectfolder}}\\_customenv\\, con startup.prg* y favicon.ico.
 
-*El acceso directo ejecuta vfp y llama a startup.prg, que define un menú con opciones para:
-- Editar afterStartup.prg (añadir aquí el código que se desee ejecutar)
+El acceso directo ejecuta vfp y llama a startup.prg, que define un menú con opciones para:
+
+- Editar config.fpw (Edita el archivo config.fpw del proyecto)
+- Editar el inicio común (código que se ejecuta para todos los proyectos)
+- Editar el inicio del proyecto (código que se ejecuta para este proyecto)
+- ver/editar historial de comandos
 - Ejecutar startup.prg (F5) (reinicia el entorno)
-- Editar config.fpw
 - Abrir el Explorador de archivos (F8)
 - Abrir el Símbolo del sistema (Ctrl+F8)
 - Modificar proyecto (F9)
 - Listar archivos (F11)
-- Alternar entre escritorio y ventana activa (F12)
-
-Si tiene una rutina de configuración común que desea ejecutar en todos sus proyectos, simplemente inclúyala en "afterstartup".
+- Alternar entre el escritorio y la ventana activa (F12)
 
 nota:
- Ejecute esta utilidad tantas veces como necesite para una carpeta para recrear/reparar el acceso directo o actualizar a una nueva versión
+ Ejecute esta utilidad tantas veces como necesite para recrear/reparar un acceso directo o actualizar a una nueva versión de esta utilidad
 
 -------------------------------------------------- ----------------------------
 
