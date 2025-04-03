@@ -2,7 +2,7 @@
 * Creates a custom startup environment for desired project folder
 * & shortcut in selected folder.
 * Marco Plaza, 2024,2025 nfox@nfox.dev
-* v.1.3 https://github.com/nfoxdev/nfCustomEnvHelper
+* v.1.3.1 https://github.com/nfoxdev/nfCustomEnvHelper
 *-----------------------------------------------------------------------------
 
 Private All
@@ -109,10 +109,12 @@ Try
       selectedicon = Getwordnum(GetKey(m.desktopinifile,'IconResource'),1,',')
    Endif
 
-   If !File(m.selectedicon)
-      selectedicon = Forcepath("favicon.ico",m.custfilesdir)
-   Endif
 
+   favIcon = Forcepath("favicon.ico",m.custfilesdir)
+
+   If !File(m.selectedicon)
+      selectedIcon = m.favicon
+   Endif
 
    If  !File(m.selectedicon) Or !qu('Use Icon '+m.selectedicon+'?',4)
 
@@ -131,6 +133,9 @@ Try
    If Lower(Justext(m.selectedicon)) == 'ico'
       iconcopy   = Forcepath('favicon'+Sys(2015)+'.ico',m.custfilesdir)
       Copy File (m.selectedicon) To (m.iconcopy)
+      if selectedIcon # m.favicon
+         copy file (m.selectedIcon) to (m.favicon)
+      endif
       selectedicon = m.iconcopy
    Endif
 
@@ -287,20 +292,23 @@ TEXT to temp noshow textmerge
 
 
 define pad _devpad of _msysmenu prompt 'Custom Env.'
-define popup _devpop RELATIVE
-define bar 1 of _devpop prompt ' New Folder shortcut with custom environment'
+define popup _devpop 
+define bar 1 of _devpop prompt ' New Folder shortcut with custom environment' 
 define bar 2 of _devpop prompt ' do <<JUSTFNAME(m.custStartup)>>' key F5,'F5'
 define bar 3 of _devpop prompt '* View/Edit' style 'B' invert
 define bar 4 of _devpop prompt ' edit <<JUSTFNAME(m.custConfig)>>'
-define bar 5 of _devpop prompt ' edit <<JUSTFNAME(m.afterStartup)>>'
-define bar 6 of _devpop prompt ' edit command history'
+define bar 5 of _devpop prompt ' edit common startup '
+define bar 6 of _devpop prompt ' edit project startup'
+define bar 7 of _devpop prompt ' edit command history'
 
 on pad _devpad of _msysmenu activate popup _devpop
 on selection bar 1 of _devpop do "<<m.thisprg>>"
 on selection bar 2 of _devpop do "<<m.custStartup>>"
+
 on selection bar 4 of _devpop editsource("<<m.custConfig>>")
-on selection bar 5 of _devpop editsource("<<m.afterStartup>>")
-on selection bar 6 of _devpop editsource("<<m.cmdHistory>>")
+on selection bar 5 of _devpop editsource("<<m.nfUtils>>")
+on selection bar 6 of _devpop editsource("<<m.afterStartup>>")
+on selection bar 7 of _devpop editsource("<<m.cmdHistory>>")
 
 set status bar on
 set memowidth to 100
@@ -309,21 +317,9 @@ cd "<<m.workdir>>"
 
 with _screen
 
-  .visible     = .t.
   .caption     = fullpath('')
   .forecolor   = <<getforecolor(m.custbackcolor)>>
   .backcolor   = <<m.custbackcolor>>
-
-  .fontname  = 'Ebrima'
-  .fontsize  = 12
-
-  clear
-  @ 2,5 say fullpath('') font 'foxfont',26
-  ? ' '
-  ? 'Search Path: '
-  ? '-'+strtran(set('path'),';','   -')
-  ? 'dir *.*:'
-  dir *.*
 
 endwith
 
