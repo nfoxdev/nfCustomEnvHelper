@@ -1,25 +1,27 @@
 *-------------------------------------------------------
-* adds some sample functions to nfcustomenvhelper menu
-* when called from afterstartup
+* adds some useful functions to nfcustomenvhelper menu
+* this script is common for all projects 
 *-------------------------------------------------------
 
 local thisprg,thisfolder
 
-thisprg = sys(16)
+thisprg = forceext(sys(16),'prg')
 thisfolder = fullpath('')
 
-define bar  7 of _devpop prompt '\-'
-define bar  8 of _devpop prompt ' Open File Explorer '           key f8, 'F8'
-define bar  9 of _devpop prompt ' Open CMD in current folder'    key ctrl+f8, 'ctrl+F8'
-define bar 10 of _devpop prompt ' Modify project'                key f9,'F9'
-define bar 11 of _devpop prompt ' Show files'                    key f11,'F11'
-define bar 12 of _devpop prompt ' Toggle desktop/active window'  key f12,'F12'
+define bar 50 of _devpop prompt ' * Project: ' style 'B' invert 
+define bar 51 of _devpop prompt ' Open in File Explorer '           key f8, 'F8'
+define bar 52 of _devpop prompt ' Open in CMD'    key ctrl+f8, 'ctrl+F8'
+define bar 53 of _devpop prompt ' Modify project'                key f9,'F9'
+define bar 54 of _devpop prompt ' List files'                    key f11,'F11'
+define bar 55 of _devpop prompt ' Toggle desktop/active window'  key f12,'F12'
+define bar 56 of _devpop prompt ' Edit this menu group'
 
-on selection bar  8 of _devpop do explorewd  in "&thisprg"
-on selection bar  9 of _devpop do runcmd in "&thisprg"
-on selection bar 10 of _devpop do openproject in "&thisprg"
-on selection bar 11 of _devpop do showdir in "&thisprg"
-on selection bar 12 of _devpop do activatescreen   in "&thisprg"
+on selection bar 51 of _devpop do explorewd  in "&thisprg"
+on selection bar 52 of _devpop do runcmd in "&thisprg"
+on selection bar 53 of _devpop do openproject in "&thisprg"
+on selection bar 54 of _devpop do showdir in "&thisprg"
+on selection bar 55 of _devpop do activatescreen   in "&thisprg"
+on selection bar 56 of _devpop editsource("&thisprg")
 
 *- window state
 

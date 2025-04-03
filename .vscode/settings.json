@@ -1,0 +1,32 @@
+{
+ "files.exclude": {
+  "**/.git": true,
+  "**/.svn": true,
+  "**/.hg": true,
+  "**/.DS_Store": true,
+  "**/Thumbs.db": true,
+  "**/CVS": true,
+  "**/*.FXP": true,
+  "**/*.fpt": true,
+  "**/*.cdx": true,
+  "**/*.pj?": true,
+  "**/*.??k": true,
+  "**/*.tlb": true,
+  "**/*.vbr": true,
+  "**/*.temp": true,
+  "**/*.tmp": true,
+  "**/*.fr?": true,
+  "**/bootswatch": true,
+  "**/bootstrap-5.1.3-dist": true,
+  "**/log": true,
+  "**/temp": true,
+  "www/_customEnv": true,
+  "www/.vscode": true,
+  "**/.vscode": true,
+  "**/bin": true,
+  "**/*.BAK": true,
+  "**/*.CDX": true,
+  "**/*.TBK": true
+ },
+ "hide-files.files": []
+}

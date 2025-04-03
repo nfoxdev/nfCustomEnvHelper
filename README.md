@@ -1,29 +1,24 @@
 # nfCustomEnvHelper 
 [español](#esp)
 
-Start vfp directly on your project folder from a  a shortcut with separate command \
-history, startup environment, debug sessions their own icon in the taskbar. 
- 
+Start vfp directly on any  project folder from a shortcut, and get separate command history, config.fpw, resource file and a custom icon in the taskbar! 
+
 Just save this utility on a definitive location, and run it to start the helper.
 
-nfCustomenvHelper clones the current environment files or make new ones in any folder \
-you choose and creates a shortcut on your desktop, adding a menu pad with options to \
-easily edit your config.fp and project startup routine.
+nfCustomenvHelper does not affect your VFP installation; it clones the current environment files ( or make new ones if you want ).
 
-Config.fpw and resource.dbf are saved in {{projectfolder}}\\_customenv\\, \
-along with startup.prg*, favicon.ico and a copy of the shortcut.
+Copies of Config.fpw and resource.dbf are saved in {{projectfolder}}\\_customenv\\,  with startup.prg*, favicon.ico.
 
-*startup.prg:
-- defines a menu with options to:
-  - run this utility ( make sure to save it to a definitive location )
+*The shortcut runs vfp and calls startup.prg, wich defines a menu with options to:
+  - edit afterStartup.prg ( add here any code you want to run )
+  - run startup.prg ( F5 ) ( restarts environment )
   - edit config.fpw
-  - edit startup.prg
-  - edit afterStartup.prg
-  - run startup.prg
-  - run afterStartup.prg
+  - open File Explorer ( F8 )
+  - open Command Prompt ( Ctrl+F8 )
+  - Modify Project ( F9 )
+  - List Files ( F11 )
+  - Toggle desktop/active window ( F12 )
 
-- sets 1 function key:
-  - F5: runs startup.prg 
 
 If you have a common config routine you want to run on all your projects,
 just include it in "afterstartup".
@@ -32,36 +27,25 @@ just include it in "afterstartup".
 *------------------------------------------------------------------------------*
 
 # nfCustomEnvHelper {#esp}
-Inicie vfp directamente en la carpeta de su proyecto desde un acceso directo con \
-Historial de comandos separado, entorno de inicio, sesiones de depuración \
-y su propio icono en la barra de tareas.
+Inicie VFP directamente en cualquier carpeta de proyecto desde un acceso directo y obtenga un historial de comandos, un archivo config.fpw, un archivo de recursos y un icono personalizado en la barra de tareas.
 
-Simplemente guarde esta utilidad en una ubicación definitiva y ejecútela \
-para iniciar el asistente.
+Simplemente guarde esta utilidad en una ubicación definitiva y ejecútela para iniciar el asistente.
 
-nfCustomenvHelper clona los archivos del entorno actual o crea nuevos en \
-cualquier carpeta que elijas y crea un acceso directo en su escritorio,\
-agregando un panel de menú con opciones para editar fácilmente su config.fp \
-y la rutina de inicio del proyecto.
+nfCustomenvHelper no afecta a su instalación de VFP; clona los archivos de entorno actuales (o crea nuevos si lo desea).
 
-Config.fpw y Resource.dbf se guardan en {{projectfolder}}_customenv, \
-junto con startup.prg*, favicon.ico y una copia del acceso directo.
+Las copias de Config.fpw y resource.dbf se guardan en {{projectfolder}}\\_customenv\\, con startup.prg* y favicon.ico.
 
-*inicio.prg:
-- define un menú con opciones para:
-- ejecute esta utilidad (asegúrese de guardarla en una ubicación definitiva)
-- editar config.fpw
-- editar inicio.prg
-- editar después de Startup.prg
-- ejecutar startup.prg
-- ejecutar afterStartup.prg
+*El acceso directo ejecuta vfp y llama a startup.prg, que define un menú con opciones para:
+- Editar afterStartup.prg (añadir aquí el código que se desee ejecutar)
+- Ejecutar startup.prg (F5) (reinicia el entorno)
+- Editar config.fpw
+- Abrir el Explorador de archivos (F8)
+- Abrir el Símbolo del sistema (Ctrl+F8)
+- Modificar proyecto (F9)
+- Listar archivos (F11)
+- Alternar entre escritorio y ventana activa (F12)
 
-- establece 1 tecla de función:
-- F5: ejecuta startup.prg
-
-Si tiene una rutina de configuración común que desea ejecutar en todos sus proyectos,
-simplemente inclúyalo en "afterStartup".
-
+Si tiene una rutina de configuración común que desea ejecutar en todos sus proyectos, simplemente inclúyala en "afterstartup".
 
 -------------------------------------------------- ----------------------------
 

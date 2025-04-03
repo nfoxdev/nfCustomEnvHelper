@@ -1,310 +1,306 @@
-*----------------------------------------------------------------------------
+*-----------------------------------------------------------------------------
 * Creates a custom startup environment for desired project folder
-* a shortcut in selected folder.
-* Marco Plaza, 2024
-* v.1.2.7  https://github.com/nfoxdev/nfCustomEnvHelper
+* & shortcut in selected folder.
+* Marco Plaza, 2024,2025 nfox@nfox.dev
+* v.1.3 https://github.com/nfoxdev/nfCustomEnvHelper
 *-----------------------------------------------------------------------------
 
-private all
+Private All
 
-#define envfolder '_customEnv'
-#define wcap 'nfCustomEnvHelper'
-#define crlf chr(13)+chr(10)
+#Define envfolder '_customEnv'
+#Define wcap 'nfCustomEnvHelper'
+#Define crlf Chr(13)+Chr(10)
+#Define Version "1.3"
 
-set safety off
-set talk off
-set notify off
+Set Safety Off
+Set Talk Off
+Set Notify Off
 
-try
+Try
 
-	workdir = getdir('','Folder to create the shortcut and custom environment:','nfCustomEnvHelper',16+32+64)
+   workdir = Getdir('','Select target folder:','nfCustomEnvHelper',16+32+64)
 
-	if !directory(m.workdir)
-		error 'No directory selected!'
-	endif
+   If !Directory(m.workdir)
+      Error 'No directory selected!'
+   Endif
 
 *-- check & create vfpenv folder in destfolder
 
-	custfilesdir = m.workdir + envfolder
+   custfilesdir = m.workdir + envfolder
 
-	if !directory(m.custfilesdir)
-		mkdir (m.custfilesdir)
-	endif
+   If !Directory(m.custfilesdir)
+      Mkdir (m.custfilesdir)
+   Endif
 
 *-- check for _resource.dbf in dest folder:
 
-	curresource		= sys(2005)
-	custresource	= forcepath('resource.dbf',m.custfilesdir)
+   curresource      = Sys(2005)
+   custresource   = Forcepath('resource.dbf',m.custfilesdir)
 
 
 *-- SELECT CLONE / NEW ENV:
 
-	if atc(m.curresource,m.custresource) > 0
-		lreset		= qu('Reset current custom resource?')
-		lproceed 	= m.lreset
-		lclone 		= .f.
-	else
-		lproceed  	= !file(m.custresource) or qu('Destination already has a resource file! '+crlf+' overwrite?')
-		lclone 	  	= file(m.curresource)  and m.lproceed and qu('Clone current resource? No = creates a new one')
-	endif
+   lcreateresource    = !File(m.custresource) Or qu('Destination already has a resource file! '+crlf+' overwrite?')
+   lclone             = File(m.curresource)  And m.lcreateresource And qu('Clone current resource? No = creates a new one')
 
 
 *-- create resource:
 
-	set resource off
+   Set Resource Off
 
-	if m.lproceed
-		if m.lclone
-			select * from (m.curresource) into table (m.custresource)
-			use
-			use in (select(juststem(m.curresource)))
-			messagebox('Current Resource cloned',0,wcap)
-		else
-			create table (m.custresource) ( type c(12),id c(12),name m(4),readonly l(1),ckval n(6,0),data m(4),updated d(8))
-			use
-			messagebox('New Resource created',0,wcap)
-		endif
-	endif
+   If m.lcreateresource
+      If m.lclone
+         Select * From (m.curresource) Into Cursor tempresource
+         Use In (Select(Juststem(m.curresource)))
+         Copy To (m.custresource)
+         Use
+         Messagebox('Current Resource cloned',0,wcap)
+      Else
+         Create Table (m.custresource) ( Type c(12),Id c(12),Name m(4),ReadOnly l(1),ckval N(6,0),Data m(4),Updated d(8))
+         Use
+         Messagebox('New Resource created',0,wcap)
+      Endif
+   Endif
 
-	set resource on
+   Set Resource On
 
 
 *-- config.fpw in dest folder:
 
-	custconfig= forcepath('config.fpw',m.custfilesdir)
-	curconfig = sys(2019)
+   custconfig= Forcepath('config.fpw',m.custfilesdir)
+   curconfig = Sys(2019)
 
-	if atc(m.custconfig,m.curconfig) = 0
-		if file(m.curconfig)
-			copy file (m.curconfig) to (m.custconfig)
-		else
-			strtofile('',m.custconfig)
-		endif
-	endif
+   If Atc(m.custconfig,m.curconfig) = 0
+      If File(m.curconfig)
+         Copy File (m.curconfig) To (m.custconfig)
+      Else
+         Strtofile('',m.custconfig)
+      Endif
+   Endif
 
 
 *-- pick a custom backcolor:
-	custbackcolor = 0
-	messagebox('Pick a Custom Screeen BackColor...',0,wcap)
-	custbackcolor = getcolor(_screen.backcolor)
-	custbackcolor = iif(m.custbackcolor>0,m.custbackcolor,rgb(255,255,255))
+   custbackcolor = 0
+   Messagebox('Pick a Custom Screeen BackColor...',0,wcap)
+   custbackcolor = Getcolor(_Screen.BackColor)
+   custbackcolor = Iif(m.custbackcolor>0,m.custbackcolor,Rgb(255,255,255))
 
 
 *-- create afterstartup.prg in customconfig folder as sample
-	custstartup 		= forcepath('startup.prg',m.custfilesdir)
-	custafterstartup 	= forcepath('afterStartup.prg',m.custfilesdir)
-	createstartup(m.workdir,m.custstartup,m.custconfig,m.custbackcolor,custafterstartup)
+   custstartup       = Forcepath('startup.prg',m.custfilesdir)
+   custafterstartup  = Forcepath('afterStartup.prg',m.custfilesdir)
+   cmdhistory        = Forcepath('_command.prg',m.custfilesdir)
+   createstartup(m.workdir,m.custstartup,m.custconfig,m.custbackcolor,m.cmdhistory,m.custafterstartup)
 
 *-- set resource and call startup.prg in config.fpw
-	writekey(m.custconfig,'resource',m.custresource)
-	writekey(m.custconfig,'default',m.workdir)
-	writekey(m.custconfig,'command',textmerge('do "<<m.custStartup>>"'))
+   writekey(m.custconfig,'resource',m.custresource)
+   writekey(m.custconfig,'default',m.workdir)
+   writekey(m.custconfig,'command',Textmerge('do "<<m.custStartup>>"'))
 
 
 *-- select icon
 
-	selectedicon 	= ''
+   selectedicon    = ''
 
 * try use folder custom icon:
+   desktopinifile = Forcepath('desktop.ini',m.workdir)
 
-	try
-		selectedicon = strextract(filetostr(forcepath('desktop.ini',m.workdir)),'IconResource=',',')
+   If File(m.desktopinifile,1)
+      selectedicon = Getwordnum(GetKey(m.desktopinifile,'IconResource'),1,',')
+   Endif
 
-		if !file(m.selectedicon)
-			error 'no icon'
-		endif
-
-	catch
-		qu('Folder has no custom icon.. Select one for this shortcut',0)
-	endtry
+   If !File(m.selectedicon)
+      selectedicon = Forcepath("favicon.ico",m.custfilesdir)
+   Endif
 
 
-	if  !file(m.selectedicon) or !qu('Use Icon '+m.selectedicon+'?',4)
+   If  !File(m.selectedicon) Or !qu('Use Icon '+m.selectedicon+'?',4)
 
-		selectedicon = getfile('Select an ico, exe or dll file to set icon for this shortcut:ico,exe,dll','Icon.:','Select',0,'Select a custom icon for this shortcut')
+      selectedicon = Getfile('Select an ico, exe or dll file to set icon for this shortcut:ico,exe,dll','Icon.:','Select',0,'Select a custom icon for this shortcut')
 
-		if !file(m.selectedicon)
-			qu('No icon selected.. using vfp icon',0)
-			selectedicon = _vfp.servername
-		endif
+      If !File(m.selectedicon)
+         qu('No icon selected.. using vfp icon',0)
+         selectedicon = _vfp.ServerName
+      Endif
 
-	endif
+   Endif
 
 
 *-- when icon file selected is an ico ,  force windows to upate miniatures using a copy:
 
-	if lower(justext(m.selectedicon)) == 'ico'
-		iconcopy	= forcepath('favicon'+sys(2015)+'.ico',m.custfilesdir)
-		copy file (m.selectedicon) to (m.iconcopy)
-		selectedicon = m.iconcopy
-	endif
+   If Lower(Justext(m.selectedicon)) == 'ico'
+      iconcopy   = Forcepath('favicon'+Sys(2015)+'.ico',m.custfilesdir)
+      Copy File (m.selectedicon) To (m.iconcopy)
+      selectedicon = m.iconcopy
+   Endif
 
 
 *-- select shortcut folder/name:
 
-	oshell = createobject('wscript.shell')
+   oshell = Createobject('wscript.shell')
 
-	defaultshortcut = forcepath(;
-		'VFP9 @ '+proper(chrtran(m.workdir,'\:',' ')),;
-		oshell.specialfolders.item('desktop');
-		)
+   defaultshortcut = Forcepath(;
+      'VFP9 @ '+Proper(Chrtran(m.workdir,'\:',' ')),;
+      oshell.specialfolders.Item('desktop');
+      )
 
-	do while .t.
-		shname = putfile('Save shortcut as: ',m.defaultshortcut,'lnk')
-		do case
-		case !empty(m.shname)
-			exit
-		case qu(' No valid shortcut selected - Cancel procedure?',4)
-			error 'No shortcut file name selected!'
-		endcase
-	enddo
+   Do While .T.
+      shname = Putfile('Save shortcut as: ',m.defaultshortcut,'lnk')
+      Do Case
+      Case !Empty(m.shname)
+         Exit
+      Case qu(' No valid shortcut selected - Cancel procedure?',4)
+         Error 'No shortcut file name selected!'
+      Endcase
+   Enddo
 
-	shname = forceext(rtrim(evl(m.shname,m.defaultshortcut)),'lnk')
+   shname = Forceext(Rtrim(Evl(m.shname,m.defaultshortcut)),'lnk')
 
 *-- ...create shortcut
 
-	with m.oshell.createshortcut( m.shname )
-		.targetpath			= '"'+_vfp.servername+'"'
-		.workingdirectory	= m.workdir
-		.arguments			= [-c"]+m.custconfig+["]
-		.description		= 'created using nfCustomEnvHelper'
-		.windowstyle		= 1
-		.iconlocation 		= m.selectedIcon
-		.save()
-	endwith
+   With m.oshell.createshortcut( m.shname )
+      .targetpath         = '"'+_vfp.ServerName+'"'
+      .workingdirectory   = m.workdir
+      .arguments         = [-c"]+m.custconfig+["]
+      .Description      = 'created using nfCustomEnvHelper'
+      .windowstyle      = 1
+      .iconlocation       = m.selectedicon
+      .Save()
+   Endwith
 
 *-- save also in custom config folder:
-	copy file (m.shname) to (forcepath(m.shname,m.custfilesdir))
+   Copy File (m.shname) To (Forcepath(m.shname,m.custfilesdir))
 
 *-- open?:
 
-	if qu('Shortcut saved as '+m.shname+'! open? ',4)
-		!start "" "&shname"
-	endif
+   If qu('Shortcut saved as '+m.shname+'! open? ',4)
+      !Start "" "&shname"
+   Endif
 
-catch to err when err.errorno = 1098
-	messagebox(err.message,0,wcap)
+Catch To err When err.ErrorNo = 1098
+   Messagebox(err.Message,0,wcap)
 
-catch to err
-	messagebox(textmerge('oops.. <<CHR(13)>>error number:<<err.errorno>>  at:<<err.lineno>> <<CHR(13)>> <<err.message>>'),48,wcap)
+Catch To err
+   Messagebox(Textmerge('oops.. <<CHR(13)>>error number:<<err.errorno>>  at:<<err.lineno>> <<CHR(13)>> <<err.message>>'),48,wcap)
 
-endtry
+Endtry
 
 *--------------------------------------------
-function qu(cm,diagtype)
+Function qu(cm,diagtype)
 *--------------------------------------------
 
-local ures
-diagtype = evl(m.diagtype,3)
-ures = messagebox(m.cm,m.diagtype+iif(m.diagtype=4,0,256),wcap)
+Local ures
+diagtype = Evl(m.diagtype,3)
+ures = Messagebox(m.cm,m.diagtype+Iif(m.diagtype=4,0,256),wcap)
 
-if m.ures = 2
-	error 'Helper canceled'
-else
-	return ures = 6
-endif
+If m.ures = 2
+   Error 'Helper canceled'
+Else
+   Return ures = 6
+Endif
 
 *---------------------------------
-function getforecolor(tncolor)
+Function getforecolor(tncolor)
 *---------------------------------
 
-local r,g,b,luma
-r = bitand(m.tncolor, 0xff)
-g = bitand(bitrshift(m.tncolor, 8), 0xff)
-b = bitand(bitrshift(m.tncolor, 16), 0xff)
+Local r,g,b,luma
+r = Bitand(m.tncolor, 0xff)
+g = Bitand(Bitrshift(m.tncolor, 8), 0xff)
+b = Bitand(Bitrshift(m.tncolor, 16), 0xff)
 
 
 luma = ((0.299 * m.r) + (0.587 * m.g) + (0.114 * m.b)) / 255
 
-return iif(m.luma > 0.7, rgb(0,0,0), rgb(255,255,255))
+Return Iif(m.luma > 0.7, Rgb(0,0,0), Rgb(255,255,255))
 
 *---------------------------------
-function getkey(m.csrc,key)
+Function GetKey(m.csrc,Key)
 *---------------------------------
-local value
-local nel
-local array aa(1)
+Local Value
+Local nel
+Local Array aa(1)
 
-value = ''
-try
+Value = ''
+Try
 
-	alines(aa,filetostr(m.csrc))
-	nel=ascan(aa,m.key)
-	if upper( getwordnum(aa(m.nel),1,'=')) == upper(m.key)
-		value = getwordnum(aa(m.nel),2,'=')
-	endif
+   Alines(aa,Filetostr(m.csrc))
+   nel=Ascan(aa,m.key)
+   If Upper( Getwordnum(aa(m.nel),1,'=')) == Upper(m.key)
+      Value = Getwordnum(aa(m.nel),2,'=')
+   Endif
 
-catch
-endtry
+Catch
+Endtry
 
-return m.value
+Return m.value
 
 
 *-------------------------------------
-function writekey(m.csrc,key,value)
+Function writekey(m.csrc,Key,Value)
 *-------------------------------------
 
-local nkv,addk,line,aa(1)
+Local nkv,addk,Line,aa(1)
 
-if vartype(m.key) # 'C' or vartype(m.value) # 'C'
-	error 'key value not a character expression'
-endif
+If Vartype(m.key) # 'C' Or Vartype(m.value) # 'C'
+   Error 'key value not a character expression'
+Endif
 
 nkv = m.key+'='+m.value+crlf
 
-alines(aa,filetostr(m.csrc))
+Alines(aa,Filetostr(m.csrc))
 
-addk = .t.
+addk = .T.
 
-strtofile('',m.csrc)
+Strtofile('',m.csrc)
 
-for each line in aa
+For Each Line In aa
 
-	if atc(m.key,getwordnum(m.line,1,'='))>0
-		strtofile(m.nkv,m.csrc,1)
-		addk = .f.
-	else
-		strtofile(m.line+crlf,m.csrc,1)
-	endif
+   If Atc(m.key,Getwordnum(m.line,1,'='))>0
+      Strtofile(m.nkv,m.csrc,1)
+      addk = .F.
+   Else
+      Strtofile(m.line+crlf,m.csrc,1)
+   Endif
 
-endfor
+Endfor
 
-if m.addk
-	strtofile(m.nkv,m.csrc,1)
-endif
+If m.addk
+   Strtofile(m.nkv,m.csrc,1)
+Endif
 
 
-*---------------------------------------------------------------------------------------
-procedure createstartup(workdir,custstartup,custconfig,custbackcolor,afterstartup)
-*---------------------------------------------------------------------------------------
+*---------------------------------------------------------------------------------------------
+Procedure createstartup(workdir,custstartup,custconfig,custbackcolor,cmdhistory,afterstartup)
+*---------------------------------------------------------------------------------------------
 
-local projfile,thisprg,temp
+*-- creates startup.prg for this project folder
 
-*-- create startup.prg
+thisprg = Forceext(Getwordnum(Sys(16),3),'prg')
+nfutils = Forcepath("nfCustomEnvHelperUtils.prg",Justpath(m.thisprg))
 
-thisprg = forceext(getwordnum(sys(16),3),'prg')
-
-text to temp noshow textmerge
+TEXT to temp noshow textmerge
 *-------------------------------------------------------
 * Custom startup generated by nfCustomEnvHelper.prg
+* DO NOT EDIT THIS FILE! TO ADD EXTRA STEPS AT STARTUP, USE "EDIT AFTERSTARTUP.PRG" IN OPTIONS MENU
 * https://github.com/nfoxdev/nfCustomEnvHelper
 *-------------------------------------------------------
 
+
 define pad _devpad of _msysmenu prompt 'Custom Env.'
-define popup _devpop 
-define bar 1 of _devpop prompt ' Create a Custom Startup'
-define bar 2 of _devpop prompt ' do "<<JUSTFNAME(m.custStartup)>>"' key F5,'F5'
-define bar 3 of _devpop prompt '\-'
-define bar 4 of _devpop prompt ' edit "<<JUSTFNAME(m.custConfig)>>"'
-define bar 5 of _devpop prompt ' edit "<<JUSTFNAME(m.custStartup)>>"'
-define bar 6 of _devpop prompt ' edit "<<JUSTFNAME(m.custAfterStartup)>>"'
+define popup _devpop RELATIVE
+define bar 1 of _devpop prompt ' New Folder shortcut with custom environment'
+define bar 2 of _devpop prompt ' do <<JUSTFNAME(m.custStartup)>>' key F5,'F5'
+define bar 3 of _devpop prompt '* View/Edit' style 'B' invert
+define bar 4 of _devpop prompt ' edit <<JUSTFNAME(m.custConfig)>>'
+define bar 5 of _devpop prompt ' edit <<JUSTFNAME(m.afterStartup)>>'
+define bar 6 of _devpop prompt ' edit command history'
 
 on pad _devpad of _msysmenu activate popup _devpop
 on selection bar 1 of _devpop do "<<m.thisprg>>"
 on selection bar 2 of _devpop do "<<m.custStartup>>"
 on selection bar 4 of _devpop editsource("<<m.custConfig>>")
-on selection bar 5 of _devpop editsource("<<m.custStartup>>")
-on selection bar 6 of _devpop editsource("<<m.custAfterStartup>>")
+on selection bar 5 of _devpop editsource("<<m.afterStartup>>")
+on selection bar 6 of _devpop editsource("<<m.cmdHistory>>")
 
 set status bar on
 set memowidth to 100
@@ -313,10 +309,10 @@ cd "<<m.workdir>>"
 
 with _screen
 
-  .visible  	= .t.
-  .caption   	= fullpath('')
-  .forecolor  	= <<getforecolor(m.custbackcolor)>>
-  .backcolor   	= <<m.custbackcolor>>
+  .visible     = .t.
+  .caption     = fullpath('')
+  .forecolor   = <<getforecolor(m.custbackcolor)>>
+  .backcolor   = <<m.custbackcolor>>
 
   .fontname  = 'Ebrima'
   .fontsize  = 12
@@ -331,6 +327,8 @@ with _screen
 
 endwith
 
+do <<forcepath("nfcustomenvhelperutils.prg",justpath(m.thisprg))>>
+
 if file("<<m.afterStartup>>")
   do "<<m.afterStartup>>"
 endif
@@ -341,24 +339,24 @@ ENDTEXT
 
 *-- save startup.prg:
 
-strtofile(m.temp,m.custstartup)
+Strtofile(m.temp,m.custstartup)
 
 
 *-- create afterStartup.prg if not present:
 
-if !file(m.afterstartup)
+If !File(m.afterstartup)
 
-	text to temp noshow textmerge
+   TEXT to temp noshow textmerge
 *-------------------------------------------------------
-* Custom startup generated by nfCustomEnvHelper.prg
-* https://github.com/nfoxdev/nfCustomEnvHelper
+* Generated by nfCustEnvHelper.prg
+* https://github.com/nfoxdev/customEnvHelper
 *-------------------------------------------------------
 * place here code to run after startup for this project
 *
 *
-do <<forcepath("nfCustomEnvHelperUtils.prg",justpath(m.thisprg))>>
-	ENDTEXT
+   ENDTEXT
 
-	strtofile(m.temp,m.afterstartup)
+   Strtofile(m.temp,m.afterstartup)
 
-endif
+Endif
+
