@@ -24,8 +24,14 @@ The shortcut runs vfp and calls startup.prg, wich defines a menu with options to
 
 note:
  Run this utility as many times as you need to recreate/fix a shortcut or update to a newer version
+ 
+ Notes for Ver 1.4:
+ - You can now set the screen color using "screenBackColor" and "screenForeColor" in config.fpw
 
-*------------------------------------------------------------------------------*
+ - Please recreate the shortcuts to update to this version.
+   "Common Startup" was pointing to nfCustomenvHelperUtils.prg in prior version - now it points to commonStart.prg. Please edit nfCustomenvHelperUtils.prg to move your common startup code to commonStar.prg, then you can delete nfCustomenvHelperUtils.prg
+
+------------------------------------------------------------------------------
 
 # nfCustomEnvHelper {#esp}
 Inicie VFP directamente en cualquier carpeta de proyecto desde un acceso directo y obtenga un historial de comandos, un archivo config.fpw, un archivo de recursos y un icono personalizado en la barra de tareas.
@@ -52,6 +58,10 @@ El acceso directo ejecuta vfp y llama a startup.prg, que define un menú con opc
 nota:
  Ejecute esta utilidad tantas veces como necesite para recrear/reparar un acceso directo o actualizar a una nueva versión de esta utilidad
 
+Notas para Ver 1.4:
+- Ahora puede cambiar el color de la pantalla de inicio usando las llaves "screenBackColor" y "screenForeColor" en su config.fpw
+
+En la versión anterior, "Common Startup" apuntaba a nfCustomenvHelperUtils.prg; ahora apunta a commonStart.prg. Edite nfCustomenvHelperUtils.prg para mover su código de inicio común a commonStart.prg, luego podrá borrar nfCustomenvHelperUtils.prg
 -------------------------------------------------- ----------------------------
 
  
