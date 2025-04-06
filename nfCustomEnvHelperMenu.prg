@@ -1,5 +1,5 @@
 *------------------------------------------------------------
-* nfCustomEnvHelper main menu 
+* nfCustomEnvHelper 1.4.1 main menu 
 *------------------------------------------------------------
 Parameters projectfolder
 
@@ -16,16 +16,16 @@ afterstartup = Forcepath('afterstartup.prg'  ,m.custfolder)
 cmdhistory   = Forcepath('_command.prg'      ,m.custfolder)
 nfcustomenvhelper = Forcepath('nfCustomenvHelper.prg',m.thisfolder)
 
-
 Define Pad _devpad Of _Msysmenu Prompt 'Custom Env.'
-Define Popup _devpop
+Define Popup _devpop relative
+define bar 50 of _devpop prompt '* v.1.4.1 *' Style 'B' invert
 Define Bar  1 Of _devpop Prompt ' New Folder shortcut with custom environment'
 Define Bar  2 Of _devpop Prompt ' do startup' Key f5,'F5'
 Define Bar  3 Of _devpop Prompt '* View/Edit' Style 'B' invert
 Define Bar  4 Of _devpop Prompt ' edit config.fpw'
 Define Bar  5 Of _devpop Prompt ' edit common startup '
 Define Bar  6 Of _devpop Prompt ' edit project startup'
-Define Bar  7 Of _devpop Prompt ' edit command history'
+Define Bar  7 Of _devpop Prompt ' view command history'
 Define Bar  8 Of _devpop Prompt ' * Project: ' Style 'B' invert
 Define Bar  9 Of _devpop Prompt ' Open in File Explorer '       Key f8, 'F8'
 Define Bar 10 Of _devpop Prompt ' Open in CMD'    Key ctrl+f8, 'ctrl+F8'
@@ -35,11 +35,11 @@ Define Bar 13 Of _devpop Prompt ' Toggle desktop/active window'  Key f12,'F12'
 
 On Pad _devpad Of _Msysmenu Activate Popup _devpop
 On Selection Bar  1 Of _devpop Do "&nfCustomEnvHelper"
-On Selection Bar  2 Of _devpop Do "&thisprg" With "&thisfolder"
+On Selection Bar  2 Of _devpop Do "&thisprg" With "&projectfolder"
 On Selection Bar  4 Of _devpop Modify File "&custConfig"
 On Selection Bar  5 Of _devpop Editsource("&commonStart")
 On Selection Bar  6 Of _devpop Editsource("&afterStartup")
-On Selection Bar  7 Of _devpop Editsource("&cmdHistory")
+On Selection Bar  7 Of _devpop modi command "&cmdHistory" noedit
 On Selection Bar  9 Of _devpop Do explorewd     In "&thisprg"
 On Selection Bar 10 Of _devpop Do runcmd        In "&thisprg>>"
 On Selection Bar 11 Of _devpop Do openproject   In "&thisprg>>"
@@ -48,9 +48,32 @@ On Selection Bar 13 Of _devpop Do activatescreen   In "&thisprg"
 
 Set Sysmenu Save
 
-*- get/set screen color
+*- window state
+_Screen.AddProperty('oCustEnv',Createobject('empty'))
+AddProperty(_Screen.ocustenv,'lastWontop','')
 
-with _screen
+*- make sure we are in desired folder before & after
+Cd (m.projectfolder)
+
+*- screen color 
+do setScreenColor
+
+checkstartprgs(m.commonstart,afterstartup)
+Do "&commonstart"
+Do "&afterStartup"
+
+*- make sure we are in desired folder
+Cd (m.projectfolder)
+
+do showdir
+
+
+*------------------------------------------------
+procedure setScreenColor
+*------------------------------------------------
+With _Screen
+
+   * set project screen color
    Try
       cconfig  = Filetostr(Sys(2019))
       fc = Strextract(m.cconfig,"screenForeColor=","",1,1)
@@ -60,26 +83,10 @@ with _screen
    Catch
    Endtry
 
-   .Caption     = Fullpath('')
+   .Caption   = Fullpath('')
+   clear
+
 endwith
-
-
-*- make sure we are in desired folder before & after
-Cd (m.projectfolder)
-
-
-checkstartprgs(m.commonstart,afterstartup)
-Do "&commonstart"
-Do "&afterStartup"
-
-*- make sure we are in desired folder
-Cd (m.projectfolder)
-
-*- window state
-
-_Screen.AddProperty('oCustEnv',Createobject('empty'))
-AddProperty(_Screen.ocustenv,'toggle',.T.)
-AddProperty(_Screen.ocustenv,'lastWontop','')
 
 
 *------------------------------------------------
@@ -98,39 +105,7 @@ If !File(m.commonstart)
 *
 *
 
-With _Screen
-
-   * set project screen color
-   Try
-      cconfig  = Filetostr(Sys(2019))
-      fc = Strextract(m.cconfig,"screenForeColor=","",1,1)
-      bc = Strextract(m.cconfig,"screenBackColor=","",1,1)
-      .ForeColor   = Evl(val(m.fc),.ForeColor)
-      .BackColor   = Evl(val(m.bc),.BackColor)
-   Catch
-   Endtry
-
-   .Caption   = Fullpath('')
-   .FontName  = 'Consolas'
-   .FontSize  = 12
-
-  set status bar on
-
-   Clear
-   @ 2,5 Say Fullpath('') Font 'Ebrima',26
-   ? ' '
-   ? ' '
-   ? 'Search Path: '
-   ? '-'+Strtran(Set('path'),';','   -')
-   ? 'dir *.*:'
-   Dir *.*
-
-Endwith
-
-
-
-   ENDTEXT
-
+   do showdir in "&thisprg"
    Strtofile(m.temp,m.commonstart)
 
 Endif
@@ -187,35 +162,33 @@ oexp.explore(Fullpath(''))
 Procedure showdir()
 *----------------------------
 
-activatescreen(.T.)
+   activatescreen(.T.)
 
-Clear
-@ 2,5 Say Fullpath('') Font 'Ebrima',24
-? ' '
-? ' '
-? 'Search Path: '
-? Strtran(Set('path'),';','  ')
-? ''
-? 'Files:'
-dir *.*
+   Clear
+   @ 2,5 Say Fullpath('') Font 'Ebrima',26
+   ? ' '
+   ? ' '
+   ? 'Search Path: '
+   ? '-'+Strtran(Set('path'),';','   -')
+   ? 'dir *.*:'
+   Dir *.*
+
 
 *------------------------------
 Function activatescreen(ShowD)
 *------------------------------
 With _Screen.ocustenv
 
-   If .toggle Or m.showd
+   If !empty(wontop()) Or m.showd
       .lastwontop = Wontop()
-      Activate Screen
       Hide Window All
+      Activate Screen
       Sys(1500,'_MWI_CMD','_MWINDOW')
-      .toggle = .F.
    Else
       Sys(1500,'_MWI_HIDE','_MWINDOW')
       Show Window All
-      .toggle = .T.
       If !Empty(.lastwontop) And Wexist(.lastwontop)
-         Activate Window (.lastwontop)
+         activate Window (.lastwontop)
       Endif
       .lastwontop = ''
    Endif

@@ -2,7 +2,7 @@
 * Creates a custom startup environment for desired project folder
 * & shortcut in selected folder.
 * Marco Plaza, 2024,2025 nfox@nfox.dev
-* v.1.4 https://github.com/nfoxdev/nfCustomEnvHelper
+* v.1.4.1 https://github.com/nfoxdev/nfCustomEnvHelper 
 *-----------------------------------------------------------------------------
 
 Private All
@@ -40,8 +40,8 @@ Try
 
 *-- SELECT CLONE / NEW ENV:
 
-   lcreateresource    = !File(m.custresource) Or qu('Destination already has a resource file! '+crlf+' overwrite?')
-   lclone             = File(m.curresource)  And m.lcreateresource And qu('Clone current resource? No = creates a new one')
+   lcreateresource    = !File(m.custresource) Or qu('Destination already has a resource file! '+crlf+' overwrite?',3)
+   lclone             = File(m.curresource)  And m.lcreateresource And qu('Clone current resource? No = creates a new one',3)
 
 
 *-- create resource:
@@ -82,7 +82,7 @@ Try
 *-- pick a custom backcolor:
    custbackcolor = 0
    Messagebox('Pick a Custom Screeen BackColor...',0,wcap)
-   custbackcolor = Evl(Getcolor(),_Screen.BackColor)
+   custbackcolor = Evl(Getcolor(_screen.BackColor),_Screen.BackColor)
    custforecolor = getforecolor(m.custbackcolor)
 
 
@@ -134,12 +134,14 @@ Try
 *-- when icon file selected is an ico ,  force windows to upate miniatures using a copy:
 
    If Lower(Justext(m.selectedicon)) == 'ico'
+      cIcons = filetostr(m.selectedicon)
       iconcopy   = Forcepath('favicon'+Sys(2015)+'.ico',m.custfilesdir)
       erase (forcepath('favicon_*.ico',m.custfilesdir))
-      Copy File (m.selectedicon) To (m.iconcopy)
+      strtofile(m.cicons,(m.iconcopy))
       If selectedicon # m.favicon
-         Copy File (m.selectedicon) To (m.favicon)
-      Endif
+         strtofile(m.cicons,(m.favicon))
+      endif
+      release cIcons
       selectedicon = m.iconcopy
    Endif
 
@@ -202,7 +204,6 @@ Function qu(cm,diagtype)
 *--------------------------------------------
 
 Local ures
-diagtype = Evl(m.diagtype,3)
 ures = Messagebox(m.cm,m.diagtype+Iif(m.diagtype=4,0,256),wcap)
 
 If m.ures = 2

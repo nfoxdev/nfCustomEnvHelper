@@ -6,33 +6,9 @@
 *
 *
 
-With _Screen
+set path to &&  path is saved in registry; make sure is not shared
+set memowidth to int(wcols()*.9) && just a convenient setting
 
-   * set project screen color
-   Try
-      cconfig  = Filetostr(Sys(2019))
-      fc = Strextract(m.cconfig,"screenForeColor=","",1,1)
-      bc = Strextract(m.cconfig,"screenBackColor=","",1,1)
-      .ForeColor   = Evl(val(m.fc),.ForeColor)
-      .BackColor   = Evl(val(m.bc),.BackColor)
-   Catch
-   Endtry
 
-   .Caption   = Fullpath('')
-   .FontName  = 'Consolas'
-   .FontSize  = 12
-
-  set status bar on
-
-   Clear
-   @ 2,5 Say Fullpath('') Font 'Ebrima',26
-   ? ' '
-   ? ' '
-   ? 'Search Path: '
-   ? '-'+Strtran(Set('path'),';','   -')
-   ? 'dir *.*:'
-   Dir *.*
-
-Endwith
 
 
