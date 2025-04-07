@@ -1,5 +1,5 @@
 *------------------------------------------------------------
-* nfCustomEnvHelper 1.4.1 main menu 
+* nfCustomEnvHelper 1.4.2 main menu
 *------------------------------------------------------------
 Parameters projectfolder
 
@@ -17,8 +17,8 @@ cmdhistory   = Forcepath('_command.prg'      ,m.custfolder)
 nfcustomenvhelper = Forcepath('nfCustomenvHelper.prg',m.thisfolder)
 
 Define Pad _devpad Of _Msysmenu Prompt 'Custom Env.'
-Define Popup _devpop relative
-define bar 50 of _devpop prompt '* v.1.4.1 *' Style 'B' invert
+Define Popup _devpop Relative
+Define Bar 50 Of _devpop Prompt '* v.1.4.2 *' Style 'B' invert
 Define Bar  1 Of _devpop Prompt ' New Folder shortcut with custom environment'
 Define Bar  2 Of _devpop Prompt ' do startup' Key f5,'F5'
 Define Bar  3 Of _devpop Prompt '* View/Edit' Style 'B' invert
@@ -39,7 +39,7 @@ On Selection Bar  2 Of _devpop Do "&thisprg" With "&projectfolder"
 On Selection Bar  4 Of _devpop Modify File "&custConfig"
 On Selection Bar  5 Of _devpop Editsource("&commonStart")
 On Selection Bar  6 Of _devpop Editsource("&afterStartup")
-On Selection Bar  7 Of _devpop modi command "&cmdHistory" noedit
+On Selection Bar  7 Of _devpop Modi Command "&cmdHistory" Noedit
 On Selection Bar  9 Of _devpop Do explorewd     In "&thisprg"
 On Selection Bar 10 Of _devpop Do runcmd        In "&thisprg>>"
 On Selection Bar 11 Of _devpop Do openproject   In "&thisprg>>"
@@ -55,38 +55,38 @@ AddProperty(_Screen.ocustenv,'lastWontop','')
 *- make sure we are in desired folder before & after
 Cd (m.projectfolder)
 
-*- screen color 
-do setScreenColor
+*- screen color
+Do setscreencolor
 
-checkstartprgs(m.commonstart,afterstartup)
+checkstartprgs(m.commonstart,m.afterstartup)
 Do "&commonstart"
 Do "&afterStartup"
 
 *- make sure we are in desired folder
 Cd (m.projectfolder)
 
-do showdir
+Do showdir
 
 
 *------------------------------------------------
-procedure setScreenColor
+Procedure setscreencolor
 *------------------------------------------------
 With _Screen
 
-   * set project screen color
+* set project screen color
    Try
       cconfig  = Filetostr(Sys(2019))
       fc = Strextract(m.cconfig,"screenForeColor=","",1,1)
       bc = Strextract(m.cconfig,"screenBackColor=","",1,1)
-      .ForeColor   = Evl(val(m.fc),.ForeColor)
-      .BackColor   = Evl(val(m.bc),.BackColor)
+      .ForeColor   = Evl(Val(m.fc),.ForeColor)
+      .BackColor   = Evl(Val(m.bc),.BackColor)
    Catch
    Endtry
 
    .Caption   = Fullpath('')
-   clear
+   Clear
 
-endwith
+Endwith
 
 
 *------------------------------------------------
@@ -107,6 +107,8 @@ If !File(m.commonstart)
 
    do showdir in "&thisprg"
    Strtofile(m.temp,m.commonstart)
+
+   ENDTEXT
 
 Endif
 
@@ -162,16 +164,16 @@ oexp.explore(Fullpath(''))
 Procedure showdir()
 *----------------------------
 
-   activatescreen(.T.)
+activatescreen(.T.)
 
-   Clear
-   @ 2,5 Say Fullpath('') Font 'Ebrima',26
-   ? ' '
-   ? ' '
-   ? 'Search Path: '
-   ? '-'+Strtran(Set('path'),';','   -')
-   ? 'dir *.*:'
-   Dir *.*
+Clear
+@ 2,5 Say Fullpath('') Font 'Ebrima',26
+? ' '
+? ' '
+? 'Search Path: '
+? '-'+Strtran(Set('path'),';','   -')
+? 'dir *.*:'
+Dir *.*
 
 
 *------------------------------
@@ -179,7 +181,7 @@ Function activatescreen(ShowD)
 *------------------------------
 With _Screen.ocustenv
 
-   If !empty(wontop()) Or m.showd
+   If !Empty(Wontop()) Or m.showd
       .lastwontop = Wontop()
       Hide Window All
       Activate Screen
@@ -188,7 +190,7 @@ With _Screen.ocustenv
       Sys(1500,'_MWI_HIDE','_MWINDOW')
       Show Window All
       If !Empty(.lastwontop) And Wexist(.lastwontop)
-         activate Window (.lastwontop)
+         Activate Window (.lastwontop)
       Endif
       .lastwontop = ''
    Endif

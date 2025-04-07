@@ -2,7 +2,7 @@
 * Creates a custom startup environment for desired project folder
 * & shortcut in selected folder.
 * Marco Plaza, 2024,2025 nfox@nfox.dev
-* v.1.4.1 https://github.com/nfoxdev/nfCustomEnvHelper 
+* v.1.4.2 https://github.com/nfoxdev/nfCustomEnvHelper 
 *-----------------------------------------------------------------------------
 
 Private All
